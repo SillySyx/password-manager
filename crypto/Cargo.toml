@@ -1,0 +1,7 @@
+[package]
+name = "crypto"
+version = "1.0.0"
+
+[dependencies]
+rand = "0.7.3"
+c2-chacha = "0.2.3"
