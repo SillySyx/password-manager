@@ -15,5 +15,5 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        submodule: 'true'
+        submodules: 'true'
     - run: cargo test --verbose --bins --release
