@@ -1,6 +1,3 @@
-extern crate common;
-extern crate crypto;
-
 mod arguments;
 mod password;
 

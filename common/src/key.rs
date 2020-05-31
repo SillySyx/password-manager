@@ -1,5 +1,5 @@
-use app::read_app_path;
-use filesystem::{save_file, load_file};
+use crate::app::read_app_path;
+use crate::filesystem::{save_file, load_file};
 
 pub fn save_key(key: &[u8]) -> Result<(), String> {
     let mut path = read_app_path()?;

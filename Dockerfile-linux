@@ -1,8 +1,0 @@
-FROM rust:latest
-
-WORKDIR /usr/src/app
-
-RUN apt-get update 
-RUN apt-get install libgtk-3-dev -y
-
-CMD cargo build --bins

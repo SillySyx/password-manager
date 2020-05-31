@@ -1,9 +1,3 @@
-extern crate gio;
-extern crate gtk;
-
-extern crate common;
-extern crate crypto;
-
 mod ui;
 
 use gio::prelude::*;
