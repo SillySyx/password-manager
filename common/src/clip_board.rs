@@ -11,19 +11,3 @@ pub fn copy_value_to_clipboard(value: String) -> Result<(), String> {
         Err(_) => Err(String::from("Failed to copy value to clipboard")),
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test() {
-        let test_value = String::from("123");
-        copy_value_to_clipboard(test_value.clone()).unwrap();
-
-        let mut ctx: ClipboardContext = ClipboardProvider::new().unwrap();
-        let value = ctx.get_contents().unwrap();
-
-        assert_eq!(test_value, value);
-    }
-}
