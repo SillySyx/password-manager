@@ -24,10 +24,10 @@ jobs:
       run: cargo build --bins --release
 
     - name: zip artifacts
-      run: zip -j passwordmanager-linux target/release/passwordmanager target/release/passwordmanager-gui install/*
+      run: zip -j ~/passwordmanager-linux.zip target/release/passwordmanager target/release/passwordmanager-gui install/*
 
     - name: upload artifacts
       uses: actions/upload-artifact@v2
       with:
         name: linux artifacts
-        path: passwordmanager-linux
+        path: ~/passwordmanager-linux.zip
