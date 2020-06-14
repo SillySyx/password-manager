@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'cli'",
+            "name": "Debug executable 'passwordmanager'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=cli",
-                    "--package=cli"
+                    "--bin=passwordmanager",
+                    "--package=passwordmanager"
                 ],
                 "filter": {
-                    "name": "cli",
+                    "name": "passwordmanager",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'cli'",
+            "name": "Debug unit tests in executable 'passwordmanager'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=cli",
-                    "--package=cli"
+                    "--bin=passwordmanager",
+                    "--package=passwordmanager"
                 ],
                 "filter": {
-                    "name": "cli",
+                    "name": "passwordmanager",
                     "kind": "bin"
                 }
             },
@@ -44,15 +44,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'gui'",
+            "name": "Debug executable 'passwordmanager-gui'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=gui",
-                    "--package=gui"
+                    "--bin=passwordmanager-gui",
+                    "--package=passwordmanager-gui"
                 ],
                 "filter": {
-                    "name": "gui",
+                    "name": "passwordmanager-gui",
                     "kind": "bin"
                 }
             },
@@ -62,16 +62,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'gui'",
+            "name": "Debug unit tests in executable 'passwordmanager-gui'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=gui",
-                    "--package=gui"
+                    "--bin=passwordmanager-gui",
+                    "--package=passwordmanager-gui"
                 ],
                 "filter": {
-                    "name": "gui",
+                    "name": "passwordmanager-gui",
                     "kind": "bin"
                 }
             },
