@@ -1,7 +1,5 @@
 [workspace]
 members = [
-    "common",
     "crypto",
-    "cli",
-    "gui"
+    "app"
 ]
