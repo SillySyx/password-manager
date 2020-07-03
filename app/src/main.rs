@@ -1,4 +1,6 @@
 mod components;
+mod translations;
+mod config;
 
 use iced::{Sandbox, Settings};
 

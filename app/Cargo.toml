@@ -1,7 +1,11 @@
 [package]
-name = "passwordmanager-app"
+name = "passwordmanager"
 version = "0.1.0"
 edition = "2018"
 
 [dependencies]
+crypto = { path = "../crypto" }
 iced = "0.1"
+dirs = "2.0"
+clipboard = "0.5.0"
+rand = "0.7.3"

@@ -1,37 +1,58 @@
 use iced::{Element, Text, Button, button, TextInput, text_input, Container, Column, Length};
 
-use super::app::{Messages};
+use crate::components::app::Messages;
+use crate::translations::translate;
+
+#[derive(Debug, Clone)]
+pub enum UnlockMessages {
+    InputKeyChanged(String),
+}
 
 pub struct Unlock {
-    bs: button::State,
-    is: text_input::State,
+    pub input_key: String,
+
+    button_state: button::State,
+    input_state: text_input::State,
 }
 
 impl Unlock {
     pub fn new() -> Unlock {
-        Unlock { 
-            bs: button::State::new(),
-            is: text_input::State::new(),
+        Unlock {
+            input_key: String::new(),
+            button_state: button::State::new(),
+            input_state: text_input::State::new(),
         }
     }
 
     pub fn title(&self) -> String {
-        String::from("Unlock")
+        translate("unlock.title")
+    }
+
+    pub fn update(&mut self, message: UnlockMessages) {
+        match message {
+            UnlockMessages::InputKeyChanged(new_key) => self.input_key = new_key,
+        }
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let text = Text::new("Unlock view bru!");
+        let header = Text::new(translate("unlock.header"))
+            .size(26);
 
-        let input = TextInput::new(&mut self.is, "Enter Password", "", Messages::UnlockKeyChanged);
+        let description = Text::new(translate("unlock.description"))
+            .size(18);
 
-        let button = Button::new(&mut self.bs, Text::new("Ok"))
-            .width(Length::Fill)
-            .on_press(Messages::Unlock);
+        let input = TextInput::new(&mut self.input_state, &translate("input-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
+            .padding(10)
+            .password();
+
+        let button = Button::new(&mut self.button_state, Text::new(translate("unlock-button")))
+            .on_press(Messages::UnlockApp);
 
         let content = Column::new()
             .spacing(20)
             .max_width(300)
-            .push(text)
+            .push(header)
+            .push(description)
             .push(input)
             .push(button);
 

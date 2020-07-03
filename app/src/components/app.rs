@@ -1,11 +1,13 @@
 use iced::{Element, Sandbox};
 
-use super::unlock::Unlock;
+use super::unlock::{Unlock, UnlockMessages};
+use super::password::PasswordMessages;
 use super::list::List;
+use super::super::translations::translate;
+
+use crypto::generate_key_from_seed;
 
 pub struct App {
-    key: String,
-
     view: Views,
 
     list_view: List,
@@ -20,8 +22,8 @@ pub enum Views {
 
 #[derive(Debug, Clone)]
 pub enum Messages {
-    Unlock,
-    UnlockKeyChanged(String),
+    UnlockApp,
+    UnlockMessage(UnlockMessages),
 }
 
 impl Sandbox for App {
@@ -29,7 +31,6 @@ impl Sandbox for App {
 
     fn new() -> App {
         App {
-            key: String::new(),
             view: Views::Unlock,
             list_view: List::new(),
             unlock_view: Unlock::new(),
@@ -37,16 +38,18 @@ impl Sandbox for App {
     }
 
     fn title(&self) -> String {
-        match self.view {
+        let title = match self.view {
             Views::Unlock => self.unlock_view.title(),
             Views::List => self.list_view.title(),
-        }
+        };
+
+        format!("{} - {}", title, translate("app.name"))
     }
 
     fn update(&mut self, message: Messages) {
         match message {
-            Messages::Unlock => self.view = Views::List,
-            Messages::UnlockKeyChanged(key) => self.key = key,
+            Messages::UnlockApp => { self.unlock_app().unwrap_or_default(); },
+            Messages::UnlockMessage(unlock_message) => self.unlock_view.update(unlock_message),
         }
     }
 
@@ -55,5 +58,24 @@ impl Sandbox for App {
             Views::Unlock => self.unlock_view.view(),
             Views::List => self.list_view.view(),
         }
+    }
+}
+
+impl App {
+    fn unlock_app(&mut self) -> Result<(), String> {
+        if self.unlock_view.input_key.is_empty() {
+            return Err(String::from("No key specified"));
+        }
+
+        let key = generate_key_from_seed(&self.unlock_view.input_key)?;
+
+        self.unlock_view.input_key = String::new();
+        self.list_view.key = key;
+
+        self.list_view.update_password_list()?;
+
+        self.view = Views::List;
+
+        Ok(())
     }
 }
