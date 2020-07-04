@@ -1,19 +1,15 @@
-use std::path::{Path, PathBuf};
-
 use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, Button, button};
 
 use crate::components::app::Messages;
-use crate::translations::translate;
-use crate::config::read_app_path;
+use crate::components::password::Password;
+use crate::translations::{translate, Languages};
 
 pub struct List {
     pub key: [u8; 32],
-    passwords: Vec<String>,
+    passwords: Vec<Password>,
 
     scrollable_state: scrollable::State,
     add_button_state: button::State,
-    read_button_state: button::State,
-    remove_button_state: button::State,
 }
 
 impl List {
@@ -23,32 +19,35 @@ impl List {
             passwords: vec![],
             scrollable_state: scrollable::State::new(),
             add_button_state: button::State::new(),
-            read_button_state: button::State::new(),
-            remove_button_state: button::State::new(),
         }
     }
 
     pub fn title(&self) -> String {
-        translate("list.title")
+        translate(Languages::English, "list.title")
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let add_button = Button::new(&mut self.add_button_state, Text::new(translate("list.add-button")).size(16));
+        let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "list.add-button")).size(16));
         
-        let title = Text::new(translate("list.title"))
+        let title = Text::new(translate(Languages::English, "list.title"))
             .size(28)
             .width(Length::Fill);
 
         let header_row = Row::<Messages>::new()
             .push(title)
-            .push(add_button);
+            .push(add_button)
+            .padding(20);
 
         let list = self.passwords
-            .iter()
+            .iter_mut()
             .enumerate()
             .fold(Column::new(), |list, (_, password)| {
-                list.push(build_password_element(password.clone()))
-            });
+                list.push(password.view().map(move |message| {
+                    Messages::PasswordMessage(message)
+                }))
+            })
+            .padding(20)
+            .spacing(5);
             
         let content = Scrollable::new(&mut self.scrollable_state)
             .width(Length::Fill)
@@ -57,7 +56,6 @@ impl List {
 
         let layout = Column::new()
             .max_width(500)
-            .spacing(20)
             .push(header_row)
             .push(content);
 
@@ -67,50 +65,22 @@ impl List {
             .into()
     }
 
-    pub fn update_password_list(&mut self) -> Result<(), String> {
-        let password_path = password_path()?;
-        let passwords = list_passwords(&password_path)?;
+    pub fn update_password_list(&mut self) {
+        self.passwords.clear();
 
-        self.passwords = passwords;
-
-        Ok(())
-    }
-}
-
-fn password_path() -> Result<PathBuf, String> {
-    let mut app_path = read_app_path()?;
-    app_path.push("passwords");
-
-    if !app_path.exists() {
-        match std::fs::create_dir(app_path.clone()) {
-            Ok(_) => {},
-            Err(_) => return Err(String::from("failed to create password folder")),
+        for password in list_passwords() {
+            self.passwords.push(Password::new(password));
         }
     }
-
-    Ok(app_path)
 }
 
-fn list_passwords(path: &Path) -> Result<Vec<String>, String> {
-    let mut files: Vec<String> = Vec::new();
+fn list_passwords() -> Vec<String> {
+    let mut passwords: Vec<String> = Vec::new();
 
-    let dir = match std::fs::read_dir(path) {
-        Ok(dir) => dir,
-        Err(_) => return Err(String::from("Failed to read dir")),
-    };
+    passwords.push(String::from("pass1"));
+    passwords.push(String::from("pass2"));
 
-    for entry in dir {
-        let name = entry.unwrap().file_name().into_string().unwrap();
-        files.push(name);
-    }
+    passwords.sort();
 
-    files.sort();
-
-    Ok(files)
-}
-
-fn build_password_element<'a>(password: String) -> Element<'a, Messages> {
-    Row::new()
-        .push(Text::new(password).width(Length::Fill))
-        .into()
+    passwords
 }

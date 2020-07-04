@@ -1,9 +1,9 @@
 use iced::{Element, Sandbox};
 
-use super::unlock::{Unlock, UnlockMessages};
-use super::password::PasswordMessages;
-use super::list::List;
-use super::super::translations::translate;
+use crate::components::unlock::{Unlock, UnlockMessages};
+use crate::components::password::PasswordMessages;
+use crate::components::list::List;
+use crate::translations::{translate, Languages};
 
 use crypto::generate_key_from_seed;
 
@@ -24,6 +24,7 @@ pub enum Views {
 pub enum Messages {
     UnlockApp,
     UnlockMessage(UnlockMessages),
+    PasswordMessage(PasswordMessages),
 }
 
 impl Sandbox for App {
@@ -43,13 +44,14 @@ impl Sandbox for App {
             Views::List => self.list_view.title(),
         };
 
-        format!("{} - {}", title, translate("app.name"))
+        format!("{} - {}", title, translate(Languages::English, "app.name"))
     }
 
     fn update(&mut self, message: Messages) {
         match message {
             Messages::UnlockApp => { self.unlock_app().unwrap_or_default(); },
             Messages::UnlockMessage(unlock_message) => self.unlock_view.update(unlock_message),
+            _ => {},
         }
     }
 
@@ -72,7 +74,7 @@ impl App {
         self.unlock_view.input_key = String::new();
         self.list_view.key = key;
 
-        self.list_view.update_password_list()?;
+        self.list_view.update_password_list();
 
         self.view = Views::List;
 

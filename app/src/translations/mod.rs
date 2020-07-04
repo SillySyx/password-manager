@@ -1,4 +1,8 @@
-pub fn translate(key: &str) -> String {
+pub enum Languages {
+    English,
+}
+
+pub fn translate(language: Languages, key: &str) -> String {
     // find translation key in hashmap
     // if found, return translation value
 

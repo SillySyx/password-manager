@@ -1,7 +1,7 @@
 use iced::{Element, Text, Button, button, TextInput, text_input, Container, Column, Length};
 
 use crate::components::app::Messages;
-use crate::translations::translate;
+use crate::translations::{translate, Languages};
 
 #[derive(Debug, Clone)]
 pub enum UnlockMessages {
@@ -25,7 +25,7 @@ impl Unlock {
     }
 
     pub fn title(&self) -> String {
-        translate("unlock.title")
+        translate(Languages::English, "unlock.title")
     }
 
     pub fn update(&mut self, message: UnlockMessages) {
@@ -35,17 +35,17 @@ impl Unlock {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header = Text::new(translate("unlock.header"))
+        let header = Text::new(translate(Languages::English, "unlock.header"))
             .size(26);
 
-        let description = Text::new(translate("unlock.description"))
+        let description = Text::new(translate(Languages::English, "unlock.description"))
             .size(18);
 
-        let input = TextInput::new(&mut self.input_state, &translate("input-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
+        let input = TextInput::new(&mut self.input_state, &translate(Languages::English, "input-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
             .padding(10)
             .password();
 
-        let button = Button::new(&mut self.button_state, Text::new(translate("unlock-button")))
+        let button = Button::new(&mut self.button_state, Text::new(translate(Languages::English, "unlock-button")))
             .on_press(Messages::UnlockApp);
 
         let content = Column::new()

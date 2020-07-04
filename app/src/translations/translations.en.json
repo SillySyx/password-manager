@@ -8,5 +8,13 @@
         "description": "The master key is used to encrypt/decrypt your passwords, without it you will not be able to read the stored passwords on this device.",
         "input-placeholder": "Enter master key",
         "unlock-button": "Unlock"
+    },
+    "list": {
+        "title": "Passwords",
+        "add-button": "Add"
+    },
+    "password": {
+        "copy-button": "Copy",
+        "remove-button": "Remove"
     }
 }
