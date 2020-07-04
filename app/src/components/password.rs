@@ -39,7 +39,7 @@ impl Password {
             .on_press(PasswordMessages::CopyPassword(self.name.clone()));
 
         let remove_button = Button::new(&mut self.remove_state, Text::new(translate(Languages::English, "password.remove-button")).size(16))
-            .on_press(PasswordMessages::CopyPassword(self.name.clone()));
+            .on_press(PasswordMessages::RemovePassword(self.name.clone()));
 
         Row::new()
             .push(text)

@@ -24,7 +24,7 @@ pub enum Views {
 pub enum Messages {
     UnlockApp,
     UnlockMessage(UnlockMessages),
-    PasswordMessage(PasswordMessages),
+    PasswordMessage(usize, PasswordMessages),
 }
 
 impl Sandbox for App {
@@ -51,7 +51,7 @@ impl Sandbox for App {
         match message {
             Messages::UnlockApp => { self.unlock_app().unwrap_or_default(); },
             Messages::UnlockMessage(unlock_message) => self.unlock_view.update(unlock_message),
-            _ => {},
+            Messages::PasswordMessage(index, password_message) => self.list_view.update(index, password_message),
         }
     }
 

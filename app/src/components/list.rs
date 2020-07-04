@@ -1,7 +1,7 @@
 use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, Button, button};
 
 use crate::components::app::Messages;
-use crate::components::password::Password;
+use crate::components::password::{Password, PasswordMessages};
 use crate::translations::{translate, Languages};
 
 pub struct List {
@@ -26,6 +26,10 @@ impl List {
         translate(Languages::English, "list.title")
     }
 
+    pub fn update(&mut self, index: usize, message: PasswordMessages) {
+        self.passwords[index].update(message);
+    }
+
     pub fn view(&mut self) -> Element<Messages> {
         let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "list.add-button")).size(16));
         
@@ -41,9 +45,9 @@ impl List {
         let list = self.passwords
             .iter_mut()
             .enumerate()
-            .fold(Column::new(), |list, (_, password)| {
+            .fold(Column::new(), |list, (index, password)| {
                 list.push(password.view().map(move |message| {
-                    Messages::PasswordMessage(message)
+                    Messages::PasswordMessage(index, message)
                 }))
             })
             .padding(20)
