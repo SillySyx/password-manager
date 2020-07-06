@@ -5,6 +5,7 @@ edition = "2018"
 
 [dependencies]
 crypto = { path = "../crypto" }
+glob = { path = "../glob" }
 iced = "0.1"
 dirs = "2.0"
 clipboard = "0.5.0"
