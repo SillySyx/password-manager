@@ -4,6 +4,8 @@ use crate::components::app::Messages;
 use crate::components::password::{Password, PasswordMessages};
 use crate::translations::{translate, Languages};
 
+use glob::Glob;
+
 pub struct List {
     pub key: [u8; 32],
     passwords: Vec<Password>,
@@ -79,10 +81,16 @@ impl List {
 }
 
 fn list_passwords() -> Vec<String> {
-    let mut passwords: Vec<String> = Vec::new();
+    // read bytes from file
+    // decrypt bytes using key
+    // create new glob using the decrypted bytes
 
-    passwords.push(String::from("pass1"));
-    passwords.push(String::from("pass2"));
+    let glob = Glob::from(&[]).expect("failed to create glob from bytes");
+
+    let mut passwords: Vec<String> = Vec::new();
+    for entry in glob.entries {
+        passwords.push(entry.name);
+    }
 
     passwords.sort();
 
