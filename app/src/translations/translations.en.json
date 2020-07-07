@@ -16,5 +16,10 @@
     "password": {
         "copy-button": "Copy",
         "remove-button": "Remove"
+    },
+    "add": {
+        "title": "Add password",
+        "header": "Add password",
+        "description": "..."
     }
 }

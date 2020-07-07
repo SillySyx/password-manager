@@ -1,10 +1,12 @@
 use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, Button, button};
 
-use crate::components::app::Messages;
+use crate::components::app::{Messages, Views};
 use crate::components::password::{Password, PasswordMessages};
 use crate::translations::{translate, Languages};
 
-use glob::Glob;
+use crate::datastore::load_datastore;
+
+use std::error::Error;
 
 pub struct List {
     pub key: [u8; 32],
@@ -15,9 +17,9 @@ pub struct List {
 }
 
 impl List {
-    pub fn new() -> List {
-        List {
-            key: [0u8; 32],
+    pub fn new() -> Self {
+        Self {
+            key: [0; 32],
             passwords: vec![],
             scrollable_state: scrollable::State::new(),
             add_button_state: button::State::new(),
@@ -30,10 +32,16 @@ impl List {
 
     pub fn update(&mut self, index: usize, message: PasswordMessages) {
         self.passwords[index].update(message);
+
+        match self.update_password_list() {
+            Ok(_) => {},
+            Err(_) => {},
+        };
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "list.add-button")).size(16));
+        let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "list.add-button")).size(16))
+            .on_press(Messages::ChangeView(Views::AddPassword));
         
         let title = Text::new(translate(Languages::English, "list.title"))
             .size(28)
@@ -71,28 +79,27 @@ impl List {
             .into()
     }
 
-    pub fn update_password_list(&mut self) {
+    pub fn update_password_list(&mut self) -> Result<(), Box<dyn Error>> {
         self.passwords.clear();
 
-        for password in list_passwords() {
-            self.passwords.push(Password::new(password));
+        for password in list_passwords(&self.key)? {
+            self.passwords.push(Password::new(password, self.key));
         }
+
+        Ok(())
     }
 }
 
-fn list_passwords() -> Vec<String> {
-    // read bytes from file
-    // decrypt bytes using key
-    // create new glob using the decrypted bytes
-
-    let glob = Glob::from(&[]).expect("failed to create glob from bytes");
-
+fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
     let mut passwords: Vec<String> = Vec::new();
+
+    let glob = load_datastore(key)?;
+
     for entry in glob.entries {
         passwords.push(entry.name);
     }
 
     passwords.sort();
 
-    passwords
+    Ok(passwords)
 }
