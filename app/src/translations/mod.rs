@@ -1,11 +1,16 @@
+use serde_json::Value;
+
 pub enum Languages {
     English,
 }
 
-pub fn translate(_language: Languages, key: &str) -> String {
-    // find translation key in hashmap
-    // if found, return translation value
+pub fn translate(language: Languages, key: &str) -> String {
+    let translations: Value = match language {
+        Languages::English => serde_json::from_str(include_str!("translations.en.json")).expect("failed to load translations"),
+    };
 
-    // else return key
-    String::from(key)
+    match translations[key].as_str() {
+        Some(value) => String::from(value),
+        None => String::from(key),
+    }
 }
