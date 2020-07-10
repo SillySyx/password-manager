@@ -47,6 +47,7 @@ impl Unlock {
 
         let input = TextInput::new(&mut self.input_state, &translate(Languages::English, "unlock.key-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
             .padding(10)
+            .on_submit(Messages::UnlockApp)
             .password();
 
         let button = Button::new(&mut self.button_state, Text::new(translate(Languages::English, "unlock.unlock-button")))
