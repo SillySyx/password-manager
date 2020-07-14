@@ -1,7 +1,10 @@
-use iced::{Element, Text, Button, button, TextInput, text_input, Container, Column, Length};
+use iced::{Element, Text, button, TextInput, text_input, Container, Column, Row, Length};
 
+use super::{create_button, create_widget};
 use crate::components::app::Messages;
 use crate::translations::{translate, Languages};
+
+use crate::styles::HeaderStyle;
 
 #[derive(Debug, Clone)]
 pub enum UnlockMessages {
@@ -39,33 +42,49 @@ impl Unlock {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header = Text::new(translate(Languages::English, "unlock.header"))
+        let header_title = Text::new(translate(Languages::English, "unlock.header"))
+            .width(Length::Fill)
+            .vertical_alignment(iced::VerticalAlignment::Center)
             .size(26);
 
+        let header_row = Row::new()
+            .max_width(500)
+            .height(Length::Units(35))
+            .push(header_title);
+
+        let header_container = Container::new(header_row)
+            .padding(10)
+            .width(Length::Fill)
+            .center_x()
+            .style(HeaderStyle);
+
         let description = Text::new(translate(Languages::English, "unlock.description"))
-            .size(18);
+            .size(16);
 
         let input = TextInput::new(&mut self.input_state, &translate(Languages::English, "unlock.key-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
             .padding(10)
             .on_submit(Messages::UnlockApp)
             .password();
 
-        let button = Button::new(&mut self.button_state, Text::new(translate(Languages::English, "unlock.unlock-button")))
-            .on_press(Messages::UnlockApp);
+        let button = create_button(&mut self.button_state, &translate(Languages::English, "unlock.unlock-button"), Messages::UnlockApp);
 
-        let content = Column::new()
+        let content_column = Column::new()
             .spacing(20)
-            .max_width(300)
-            .push(header)
             .push(description)
             .push(input)
             .push(button);
 
-        Container::new(content)
-            .width(Length::Fill)
+        let content = create_widget(content_column);
+
+        let content_container = Container::new(content)
+            .max_width(500)
             .height(Length::Fill)
-            .center_x()
-            .center_y()
+            .center_y();
+
+        Column::new()
+            .align_items(iced::Align::Center)
+            .push(header_container)
+            .push(content_container)
             .into()
     }
 }

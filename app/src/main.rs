@@ -2,6 +2,7 @@ mod components;
 mod translations;
 mod clipboard;
 mod datastore;
+mod styles;
 
 use iced::{Sandbox, Settings};
 

@@ -1,10 +1,13 @@
-use iced::{Element, Text, Button, button, TextInput, text_input, Container, Column, Length};
+use iced::{Element, Text, button, TextInput, text_input, Container, Column, Row, Length};
 
+use crate::styles::HeaderStyle;
+use crate::components::{create_widget, create_button};
 use crate::components::app::{Messages, Views};
 use crate::translations::{translate, Languages};
 
-use glob::GlobEntry;
 use crate::datastore::{load_datastore, save_datastore};
+
+use glob::Archive;
 
 use std::error::Error;
 
@@ -51,11 +54,31 @@ impl AddPassword {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header = Text::new(translate(Languages::English, "add.header"))
+        let header_title = Text::new(translate(Languages::English, "add.header"))
+            .width(Length::Fill)
+            .vertical_alignment(iced::VerticalAlignment::Center)
             .size(26);
 
+        let back_button = create_button(
+            &mut self.back_button_state, 
+            &translate(Languages::English, "add.back-button"), 
+            Messages::ChangeView(Views::List)
+        );
+
+        let header_row = Row::new()
+            .max_width(500)
+            .height(Length::Units(35))
+            .push(header_title)
+            .push(back_button);
+
+        let header_container = Container::new(header_row)
+            .padding(10)
+            .width(Length::Fill)
+            .center_x()
+            .style(HeaderStyle);
+
         let description = Text::new(translate(Languages::English, "add.description"))
-            .size(18);
+            .size(16);
 
         let name_input = TextInput::new(&mut self.name_state, &translate(Languages::English, "add.name-placeholder"), &self.name, |value| Messages::AddPasswordUpdateInputMessage("name", value))
             .padding(10);
@@ -63,39 +86,39 @@ impl AddPassword {
         let password_input = TextInput::new(&mut self.password_state, &translate(Languages::English, "add.password-placeholder"), &self.password, |value| Messages::AddPasswordUpdateInputMessage("password", value))
             .padding(10);
 
-        let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "add.add-button")))
-            .on_press(Messages::AddPasswordMessage);
+        let add_button = create_button(
+            &mut self.add_button_state, 
+            &translate(Languages::English, "add.add-button"), 
+            Messages::AddPasswordMessage
+        );
 
-        let back_button = Button::new(&mut self.back_button_state, Text::new(translate(Languages::English, "add.back-button")))
-            .on_press(Messages::ChangeView(Views::List));
-
-        let content = Column::new()
+        let content_column = Column::new()
             .spacing(20)
-            .max_width(300)
-            .push(header)
-            .push(description)
             .push(name_input)
             .push(password_input)
             .push(add_button)
-            .push(back_button);
+            .push(description);
 
-        Container::new(content)
-            .width(Length::Fill)
+        let content = create_widget(content_column);
+
+        let content_container = Container::new(content)
+            .max_width(500)
             .height(Length::Fill)
-            .center_x()
-            .center_y()
+            .center_y();
+
+        Column::new()
+            .align_items(iced::Align::Center)
+            .push(header_container)
+            .push(content_container)
             .into()
     }
 
     pub fn add_new_password(&self, name: String, password: String) -> Result<(), Box<dyn Error>> {
-        let mut glob = load_datastore(&self.key)?;
+        let mut archive = load_datastore(&self.key)?;
 
-        glob.add(GlobEntry {
-            name, 
-            data: Some(password.as_bytes().to_owned()),
-        });
+        archive.add_entry(&name, password.as_bytes())?;
 
-        save_datastore(&self.key, glob)?;
+        save_datastore(&self.key, &mut archive)?;
 
         Ok(())
     }

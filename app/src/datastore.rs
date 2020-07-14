@@ -1,24 +1,24 @@
-use glob::Glob;
+use glob::MemoryArchive;
 
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::{Read, Write};
 
-pub fn load_datastore(key: &[u8]) -> Result<Glob, Box<dyn Error>> {
+pub fn load_datastore(key: &[u8]) -> Result<MemoryArchive, Box<dyn Error>> {
     let iv = crypto::generate_iv_from_seed("silly goose")?;
     
     let bytes = read_file_bytes()?;
     let bytes = crypto::decrypt(&bytes, key, &iv)?;
     
-    let glob = Glob::from(&bytes)?;
+    let archive = MemoryArchive::from(bytes);
 
-    Ok(glob)
+    Ok(archive)
 }
 
-pub fn save_datastore(key: &[u8], glob: Glob) -> Result<(), Box<dyn Error>> {
+pub fn save_datastore(key: &[u8], archive: &mut MemoryArchive) -> Result<(), Box<dyn Error>> {
     let iv = crypto::generate_iv_from_seed("silly goose")?;
 
-    let bytes = glob.as_bytes()?;
+    let bytes = archive.as_bytes()?;
     let bytes = crypto::encrypt(&bytes, key, &iv)?;
 
     save_file_bytes(&bytes)?;

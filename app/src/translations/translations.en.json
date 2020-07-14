@@ -2,7 +2,7 @@
     "app.name": "Password Manager",
 
     "unlock.title": "Unlock",
-    "unlock.header": "Master key",
+    "unlock.header": "Unlock",
     "unlock.description": "The master key is used to encrypt/decrypt your passwords, without it you will not be able to read the stored passwords on this device.",
     "unlock.key-placeholder": "Enter master key",
     "unlock.unlock-button": "Unlock",

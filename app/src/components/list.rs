@@ -1,5 +1,7 @@
-use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, Button, button};
+use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, button};
 
+use crate::components::create_button;
+use crate::styles::{HeaderStyle};
 use crate::components::app::{Messages, Views};
 use crate::components::password::{Password, PasswordMessages};
 use crate::translations::{translate, Languages};
@@ -7,6 +9,8 @@ use crate::translations::{translate, Languages};
 use crate::datastore::load_datastore;
 
 use std::error::Error;
+
+use glob::Archive;
 
 pub struct List {
     pub key: [u8; 32],
@@ -40,19 +44,30 @@ impl List {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let add_button = Button::new(&mut self.add_button_state, Text::new(translate(Languages::English, "list.add-button")).size(16))
-            .on_press(Messages::ChangeView(Views::AddPassword));
-        
-        let title = Text::new(translate(Languages::English, "list.title"))
-            .size(28)
-            .width(Length::Fill);
+        let header_title = Text::new(translate(Languages::English, "list.title"))
+            .width(Length::Fill)
+            .vertical_alignment(iced::VerticalAlignment::Center)
+            .size(26);
 
-        let header_row = Row::<Messages>::new()
-            .push(title)
-            .push(add_button)
-            .padding(20);
+        let add_button = create_button(
+            &mut self.add_button_state, 
+            &translate(Languages::English, "list.add-button"), 
+            Messages::ChangeView(Views::AddPassword)
+        );
 
-        let list = self.passwords
+        let header_row = Row::new()
+            .max_width(500)
+            .height(Length::Units(35))
+            .push(header_title)
+            .push(add_button);
+
+        let header_container = Container::new(header_row)
+            .padding(10)
+            .width(Length::Fill)
+            .center_x()
+            .style(HeaderStyle);
+
+        let content = self.passwords
             .iter_mut()
             .enumerate()
             .fold(Column::new(), |list, (index, password)| {
@@ -60,22 +75,20 @@ impl List {
                     Messages::PasswordMessage(index, message)
                 }))
             })
-            .padding(20)
             .spacing(5);
-            
-        let content = Scrollable::new(&mut self.scrollable_state)
-            .width(Length::Fill)
-            .align_items(Align::Center)
-            .push(list);
 
-        let layout = Column::new()
-            .max_width(500)
-            .push(header_row)
+        let content_scroller = Scrollable::new(&mut self.scrollable_state)
             .push(content);
 
-        Container::new(layout)            
-            .width(Length::Fill)
-            .center_x()
+        let content_container = Container::new(content_scroller)
+            .max_width(500)
+            .height(Length::Fill);
+
+        Column::new()
+            .align_items(Align::Center)
+            .spacing(20)
+            .push(header_container)
+            .push(content_container)
             .into()
     }
 
@@ -93,10 +106,10 @@ impl List {
 fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
     let mut passwords: Vec<String> = Vec::new();
 
-    let glob = load_datastore(key)?;
+    let mut archive = load_datastore(key)?;
 
-    for entry in glob.entries {
-        passwords.push(entry.name);
+    for entry in &archive.read_entries()? {
+        passwords.push(entry.name.clone());
     }
 
     passwords.sort();
