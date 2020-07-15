@@ -9,7 +9,9 @@ pub fn load_datastore(key: &[u8]) -> Result<MemoryArchive, Box<dyn Error>> {
     
     let bytes = read_file_bytes()?;
     let bytes = crypto::decrypt(&bytes, key, &iv)?;
-    
+
+    verify_decryption(&bytes)?;
+
     let archive = MemoryArchive::from(bytes);
 
     Ok(archive)
@@ -48,6 +50,31 @@ fn save_file_bytes(bytes: &[u8]) -> Result<(), Box<dyn Error>> {
         .open("./passwords")?;
 
     file.write(bytes)?;
+
+    Ok(())
+}
+
+fn verify_decryption(bytes: &[u8]) -> Result<(), Box<dyn Error>> {
+    if bytes.len() == 0 {
+        return Ok(());
+    }
+
+    let verify_bytes: [u8; 8] = [
+        bytes[0],
+        bytes[1],
+        bytes[2],
+        bytes[3],
+        bytes[4],
+        bytes[5],
+        bytes[6],
+        bytes[7],
+    ];
+
+    let length = usize::from_be_bytes(verify_bytes);
+
+    if length > 1024 {
+        return Err(Box::from("failed to decrypt bytes"));
+    }
 
     Ok(())
 }

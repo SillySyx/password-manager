@@ -1,5 +1,6 @@
 use iced::{Element, Text, Container, Column, Length};
 
+use crate::components::create_widget;
 use crate::components::app::Messages;
 use crate::translations::{translate, Languages};
 
@@ -25,9 +26,11 @@ impl Error {
 
         let content = Column::new()
             .spacing(20)
-            .max_width(300)
+            .max_width(500)
             .push(header)
             .push(description);
+
+        let content = create_widget(content);
 
         Container::new(content)
             .width(Length::Fill)
