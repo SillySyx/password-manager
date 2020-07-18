@@ -1,12 +1,13 @@
-use iced::{Element, Column, Row, Text, Container, Length, Align, Scrollable, scrollable, button};
+use iced::{button, scrollable, Align, Column, Container, Element, Length, Row, Scrollable, Text};
 
-use crate::components::create_button;
-use crate::styles::{HeaderStyle};
-use crate::components::app::{Messages, Views};
-use crate::components::password::{Password, PasswordMessages};
-use crate::translations::{translate, Languages};
-
-use crate::datastore::load_datastore;
+use crate::{
+    components::{create_button, Password},
+    datastore::load_datastore,
+    messages::Messages,
+    styles::HeaderStyle,
+    translations::{translate, Languages},
+    views::Views,
+};
 
 use std::error::Error;
 
@@ -30,29 +31,16 @@ impl List {
         }
     }
 
-    pub fn title(&self) -> String {
-        translate(Languages::English, "list.title")
-    }
-
-    pub fn update(&mut self, index: usize, message: PasswordMessages) {
-        self.passwords[index].update(message);
-
-        match self.update_password_list() {
-            Ok(_) => {},
-            Err(_) => {},
-        };
-    }
-
     pub fn view(&mut self) -> Element<Messages> {
-        let header_title = Text::new(translate(Languages::English, "list.title"))
+        let header_title = Text::new(translate(Languages::English, "list.header"))
             .width(Length::Fill)
             .vertical_alignment(iced::VerticalAlignment::Center)
             .size(26);
 
         let add_button = create_button(
-            &mut self.add_button_state, 
-            &translate(Languages::English, "list.add-button"), 
-            Messages::ChangeView(Views::AddPassword)
+            &mut self.add_button_state,
+            &translate(Languages::English, "list.add-button"),
+            Messages::ChangeView { view: Views::AddPassword }
         );
 
         let header_row = Row::new()
@@ -67,18 +55,16 @@ impl List {
             .center_x()
             .style(HeaderStyle);
 
-        let content = self.passwords
+        let content = self
+            .passwords
             .iter_mut()
             .enumerate()
-            .fold(Column::new(), |list, (index, password)| {
-                list.push(password.view().map(move |message| {
-                    Messages::PasswordMessage(index, message)
-                }))
+            .fold(Column::new(), |list, (_, password)| {
+                list.push(password.view())
             })
             .spacing(5);
 
-        let content_scroller = Scrollable::new(&mut self.scrollable_state)
-            .push(content);
+        let content_scroller = Scrollable::new(&mut self.scrollable_state).push(content);
 
         let content_container = Container::new(content_scroller)
             .max_width(500)

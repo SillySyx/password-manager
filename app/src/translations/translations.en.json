@@ -1,27 +1,31 @@
 {
     "app.name": "Password Manager",
 
-    "unlock.title": "Unlock",
     "unlock.header": "Unlock",
     "unlock.description": "The master key is used to encrypt/decrypt your passwords, without it you will not be able to read the stored passwords on this device.",
     "unlock.key-placeholder": "Enter master key",
     "unlock.unlock-button": "Unlock",
 
-    "list.title": "Passwords",
+    "list.header": "Passwords",
     "list.add-button": "Add",
 
     "password.copy-button": "Copy",
-    "password.remove-button": "Remove",
+    "password.edit-button": "Edit",
     
-    "add.title": "Add password",
     "add.header": "Add password",
-    "add.description": "Remember to use passphrases when possible\r\n\r\nExample:\r\nblue ring smelly door inverted pants",
     "add.name-placeholder": "Enter name",
     "add.password-placeholder": "Enter password",
     "add.add-button": "Add",
     "add.back-button": "Back",
+    "add.generate-button": "Generate passphrase",
 
-    "error.title": "Error",
     "error.header": "An error occured",
-    "error.description": "Invalid password specified"
+    "error.description": "Invalid password specified",
+    
+    "edit.header": "Edit password",
+    "edit.name-placeholder": "Enter name",
+    "edit.password-placeholder": "Enter password",
+    "edit.save-button": "Save",
+    "edit.back-button": "Back",
+    "edit.remove-button": "Remove"
 }

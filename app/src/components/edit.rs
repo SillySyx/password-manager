@@ -6,29 +6,32 @@ use crate::{
     styles::HeaderStyle,
     translations::{translate, Languages},
     views::Views,
-    passphrase::generate_passphrase,
 };
 
-pub struct AddPassword {
+pub struct EditPassword {
+    pub entry: String,
     pub name: String,
     pub password: String,
 
-    add_button_state: button::State,
+    save_button_state: button::State,
+    remove_button_state: button::State,
     back_button_state: button::State,
-    passphrase_button_state: button::State,
+
     name_state: text_input::State,
     password_state: text_input::State,
 }
 
-impl AddPassword {
+impl EditPassword {
     pub fn new() -> Self {
         Self {
+            entry: String::new(),
             name: String::new(),
             password: String::new(),
 
-            add_button_state: button::State::new(),
+            save_button_state: button::State::new(),
+            remove_button_state: button::State::new(),
             back_button_state: button::State::new(),
-            passphrase_button_state: button::State::new(),
+
             name_state: text_input::State::new(),
             password_state: text_input::State::new(),
         }
@@ -43,20 +46,21 @@ impl AddPassword {
     }
 
     pub fn reset(&mut self) {
+        self.entry = String::new();
         self.name = String::new();
         self.password = String::new();
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header_title = Text::new(translate(Languages::English, "add.header"))
+        let header_title = Text::new(translate(Languages::English, "edit.header"))
             .width(Length::Fill)
             .vertical_alignment(iced::VerticalAlignment::Center)
             .size(26);
 
         let back_button = create_button(
             &mut self.back_button_state,
-            &translate(Languages::English, "add.back-button"),
-            Messages::ChangeView { view: Views::List },
+            &translate(Languages::English, "edit.back-button"),
+            Messages::ChangeView { view: Views::List }
         );
 
         let header_row = Row::new()
@@ -73,42 +77,39 @@ impl AddPassword {
 
         let name_input = TextInput::new(
             &mut self.name_state,
-            &translate(Languages::English, "add.name-placeholder"),
+            &translate(Languages::English, "edit.name-placeholder"),
             &self.name,
-            |value| Messages::AddViewInputKeyChanged { input: "name", value },
+            |value| Messages::EditViewInputKeyChanged { input: "name", value }
         )
         .padding(10);
 
         let password_input = TextInput::new(
             &mut self.password_state,
-            &translate(Languages::English, "add.password-placeholder"),
+            &translate(Languages::English, "edit.password-placeholder"),
             &self.password,
-            |value| Messages::AddViewInputKeyChanged{ input: "password", value },
+            |value| Messages::EditViewInputKeyChanged { input: "password", value }
         )
-        .padding(10);
+        .padding(10)
+        .password();
 
-        let add_button = create_button(
-            &mut self.add_button_state,
-            &translate(Languages::English, "add.add-button"),
-            Messages::AddPasswordMessage { name: self.name.clone(), password: self.password.clone() },
+        let save_button = create_button(
+            &mut self.save_button_state,
+            &translate(Languages::English, "edit.save-button"),
+            Messages::UpdatePassword { entry: self.entry.clone(), name: self.name.clone(), password: self.password.clone() }
         );
 
-        let generate_passphrase_button = create_button(
-            &mut self.passphrase_button_state,
-            &translate(Languages::English, "add.generate-button"),
-            Messages::GeneratePassphraseForAddView,
+        let remove_button = create_button(
+            &mut self.remove_button_state,
+            &translate(Languages::English, "edit.remove-button"),
+            Messages::RemovePassword { name: self.name.clone() }
         );
-
-        let buttons = Row::new()
-            .push(add_button)
-            .push(iced::Space::with_width(Length::Fill))
-            .push(generate_passphrase_button);
 
         let content_column = Column::new()
             .spacing(20)
             .push(name_input)
             .push(password_input)
-            .push(buttons);
+            .push(save_button)
+            .push(remove_button);
 
         let content = create_widget(content_column);
 
@@ -122,11 +123,5 @@ impl AddPassword {
             .push(header_container)
             .push(content_container)
             .into()
-    }
-
-    pub fn generate_passphrase(&mut self) {
-        if let Ok(passphrase) = generate_passphrase() {
-            self.password = passphrase;
-        }
     }
 }

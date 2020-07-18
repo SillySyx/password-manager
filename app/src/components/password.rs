@@ -1,24 +1,17 @@
-use iced::{Element, Text, Row, Length, button};
+use iced::{button, Element, Length, Row, Text};
 
-use crate::components::{create_widget, create_button};
-use crate::translations::{translate, Languages};
-use crate::datastore::{load_datastore, save_datastore};
-use crate::clipboard::copy_value_to_clipboard;
-
-use glob::Archive;
-
-#[derive(Debug, Clone)]
-pub enum PasswordMessages {
-    CopyPassword(String),
-    RemovePassword(String),
-}
+use crate::{
+    components::{create_button, create_widget},
+    messages::Messages,
+    translations::{translate, Languages},
+};
 
 pub struct Password {
     pub key: [u8; 32],
     pub name: String,
 
+    edit_state: button::State,
     copy_state: button::State,
-    remove_state: button::State,
 }
 
 impl Password {
@@ -26,65 +19,37 @@ impl Password {
         Self {
             key,
             name,
+            edit_state: button::State::new(),
             copy_state: button::State::new(),
-            remove_state: button::State::new(),
         }
     }
 
-    pub fn update(&mut self, message: PasswordMessages) {
-        match message {
-            PasswordMessages::CopyPassword(name) => self.copy_password(name),
-            PasswordMessages::RemovePassword(name) => self.remove_password(name),
-        }
-    }
+    pub fn view(&mut self) -> Element<Messages> {
+        let text = Text::new(&self.name).width(Length::Fill);
 
-    pub fn view(&mut self) -> Element<PasswordMessages> {
-        let text = Text::new(&self.name)
-            .width(Length::Fill);
+        let edit_button = create_button(
+            &mut self.edit_state,
+            &translate(Languages::English, "password.edit-button"),
+            Messages::EditPassword { name: self.name.clone() }
+        )
+        .padding(5);
 
         let copy_button = create_button(
-            &mut self.copy_state, 
+            &mut self.copy_state,
             &translate(Languages::English, "password.copy-button"),
-            PasswordMessages::CopyPassword(self.name.clone())
-        );
-
-        let remove_button = create_button(
-            &mut self.remove_state, 
-            &translate(Languages::English, "password.remove-button"),
-            PasswordMessages::RemovePassword(self.name.clone())
-        );
+            Messages::CopyPassword { name: self.name.clone() }
+        )
+        .padding(5);
 
         let row = Row::new()
             .push(text)
+            .push(edit_button)
             .push(copy_button)
-            .push(remove_button)
-            .spacing(5);
+            .spacing(5)
+            .align_items(iced::Align::Center);
 
-        create_widget(row).into()
-    }
-
-    fn copy_password(&self, name: String) {
-        let mut archive = load_datastore(&self.key).expect("failed to load data");
-
-        let entry = archive.find_entry(&name).expect("failed to find entry");
-
-        let data = match archive.read_entry_data(&entry) {
-            Ok(data) => data,
-            Err(_) => return,
-        };
-
-        let password = String::from_utf8(data.clone()).expect("failed to read password");
-
-        copy_value_to_clipboard(password).expect("failed to copy password to clipboard");
-    }
-
-    fn remove_password(&self, name: String) {
-        let mut archive = load_datastore(&self.key).expect("failed to load data");
-
-        let entry = archive.find_entry(&name).expect("failed to find entry");
-
-        archive.remove_entry(&entry).expect("failed to remove entry");
-
-        save_datastore(&self.key, &mut archive).expect("failed to save data");
+        create_widget(row)
+            .padding(10)
+            .into()
     }
 }

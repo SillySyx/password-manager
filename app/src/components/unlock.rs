@@ -1,15 +1,11 @@
-use iced::{Element, Text, button, TextInput, text_input, Container, Column, Row, Length};
+use iced::{button, text_input, Column, Container, Element, Length, Row, Text, TextInput};
 
-use super::{create_button, create_widget};
-use crate::components::app::Messages;
-use crate::translations::{translate, Languages};
-
-use crate::styles::HeaderStyle;
-
-#[derive(Debug, Clone)]
-pub enum UnlockMessages {
-    InputKeyChanged(String),
-}
+use crate::{
+    components::{create_button, create_widget},
+    messages::Messages,
+    styles::HeaderStyle,
+    translations::{translate, Languages},
+};
 
 pub struct Unlock {
     pub input_key: String,
@@ -24,16 +20,6 @@ impl Unlock {
             input_key: String::new(),
             button_state: button::State::new(),
             input_state: text_input::State::new(),
-        }
-    }
-
-    pub fn title(&self) -> String {
-        translate(Languages::English, "unlock.title")
-    }
-
-    pub fn update(&mut self, message: UnlockMessages) {
-        match message {
-            UnlockMessages::InputKeyChanged(new_key) => self.input_key = new_key,
         }
     }
 
@@ -58,15 +44,23 @@ impl Unlock {
             .center_x()
             .style(HeaderStyle);
 
-        let description = Text::new(translate(Languages::English, "unlock.description"))
-            .size(16);
+        let description = Text::new(translate(Languages::English, "unlock.description")).size(16);
 
-        let input = TextInput::new(&mut self.input_state, &translate(Languages::English, "unlock.key-placeholder"), &self.input_key, |message| Messages::UnlockMessage(UnlockMessages::InputKeyChanged(message)))
-            .padding(10)
-            .on_submit(Messages::UnlockApp)
-            .password();
+        let input = TextInput::new(
+            &mut self.input_state,
+            &translate(Languages::English, "unlock.key-placeholder"),
+            &self.input_key,
+            |value| Messages::UnlockViewInputKeyChanged { value }
+        )
+        .padding(10)
+        .on_submit(Messages::UnlockApp { key: self.input_key.clone() })
+        .password();
 
-        let button = create_button(&mut self.button_state, &translate(Languages::English, "unlock.unlock-button"), Messages::UnlockApp);
+        let button = create_button(
+            &mut self.button_state,
+            &translate(Languages::English, "unlock.unlock-button"),
+            Messages::UnlockApp { key: self.input_key.clone() }
+        );
 
         let content_column = Column::new()
             .spacing(20)

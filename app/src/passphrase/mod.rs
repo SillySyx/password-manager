@@ -1,7 +1,7 @@
 use rand::seq::SliceRandom;
 use rand::thread_rng;
 
-pub fn generate_passphrase() -> Result<String, String> {
+pub fn generate_passphrase() -> Result<String, Box::<dyn std::error::Error>> {
     let mut rng = thread_rng();
 
     let mut adjectives = list_adjectives();

@@ -1,28 +1,22 @@
-use iced::{Element, Text, Container, Column, Length};
+use iced::{Column, Container, Element, Length, Text};
 
-use crate::components::create_widget;
-use crate::components::app::Messages;
-use crate::translations::{translate, Languages};
+use crate::{
+    components::create_widget,
+    messages::Messages,
+    translations::{translate, Languages},
+};
 
-pub struct Error {
-}
+pub struct Error {}
 
 impl Error {
     pub fn new() -> Self {
-        Self {
-        }
-    }
-
-    pub fn title(&self) -> String {
-        translate(Languages::English, "error.title")
+        Self {}
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header = Text::new(translate(Languages::English, "error.header"))
-            .size(26);
+        let header = Text::new(translate(Languages::English, "error.header")).size(26);
 
-        let description = Text::new(translate(Languages::English, "error.description"))
-            .size(18);
+        let description = Text::new(translate(Languages::English, "error.description")).size(18);
 
         let content = Column::new()
             .spacing(20)

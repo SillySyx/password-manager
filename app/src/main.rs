@@ -3,11 +3,12 @@ mod translations;
 mod clipboard;
 mod datastore;
 mod styles;
+mod messages;
+mod views;
+mod passphrase;
 
 use iced::{Sandbox, Settings};
 
-use components::App;
-
 pub fn main() {
-    App::run(Settings::default())
+    components::App::run(Settings::default())
 }
