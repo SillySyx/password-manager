@@ -1,5 +1,2 @@
 /target
-/build
-
-*.glade~
-*.glade#
+/passwords

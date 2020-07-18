@@ -1,0 +1,39 @@
+mod addpassword;
+mod app;
+mod edit;
+mod error;
+mod list;
+mod password;
+mod unlock;
+
+pub use {
+    app::App,
+    unlock::Unlock,
+    list::List,
+    password::Password,
+    addpassword::AddPassword,
+    error::Error,
+    edit::EditPassword,
+};
+
+pub fn create_button<'a, T>(
+    state: &'a mut iced::button::State,
+    text: &str,
+    message: T,
+) -> iced::Button<'a, T> {
+    let text = iced::Text::new(text).size(16);
+
+    iced::Button::new(state, text)
+        .on_press(message)
+        .padding(10)
+        .style(super::styles::MainStyle)
+}
+
+pub fn create_widget<'a, T, C>(content: C) -> iced::Container<'a, T>
+where
+    C: Into<iced::Element<'a, T>>,
+{
+    iced::Container::new(content)
+        .padding(20)
+        .style(super::styles::WidgetStyle)
+}
