@@ -19,6 +19,7 @@ fn list_adjectives() -> Vec<String> {
     source
         .split(|c| c == '\r' || c == '\n')
         .map(|s| s.to_owned())
+        .filter(|s| !s.is_empty())
         .collect::<Vec<String>>()
 }
 
@@ -28,5 +29,6 @@ fn list_nouns() -> Vec<String> {
     source
         .split(|c| c == '\r' || c == '\n')
         .map(|s| s.to_owned())
+        .filter(|s| !s.is_empty())
         .collect::<Vec<String>>()
 }
