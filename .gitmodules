@@ -4,3 +4,6 @@
 [submodule "glob"]
 	path = glob
 	url = git@github.com:SillySyx/glob.git
+[submodule "event-sourcing"]
+	path = event-sourcing
+	url = git@github.com:SillySyx/event-sourcing.git

@@ -8,6 +8,8 @@ mod styles;
 mod messages;
 mod views;
 mod passphrase;
+mod states;
+mod events;
 
 use iced::{Sandbox, Settings};
 
