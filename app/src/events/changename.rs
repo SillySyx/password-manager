@@ -4,8 +4,24 @@ use crate::states::PasswordsState;
 
 #[derive(Debug)]
 pub struct ChangeNameEvent {
-    name: String,
-    new_name: String,
+    pub name: String,
+    pub new_name: String,
+}
+
+impl ChangeNameEvent {
+    pub fn from_json(json: &serde_json::Value) -> Option<Self> {
+        if json["type"] != "ChangeName" {
+            return None;
+        }
+    
+        let name = json["name"].as_str()?;
+        let new_name = json["new_name"].as_str()?;
+    
+        Some(Self {
+            name: name.to_string(),
+            new_name: new_name.to_string(),
+        })
+    }
 }
 
 impl Event<PasswordsState> for ChangeNameEvent {

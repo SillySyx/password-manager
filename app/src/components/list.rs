@@ -2,7 +2,7 @@ use iced::{button, scrollable, Align, Column, Container, Element, Length, Row, S
 
 use crate::{
     components::{create_button, Password},
-    datastore::load_datastore,
+    datastore::{load_datastore, load_state},
     messages::Messages,
     styles::HeaderStyle,
     translations::{translate, Languages},
@@ -90,6 +90,10 @@ impl List {
 }
 
 fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
+    let test = load_state(key)?;
+    println!("{:?}", test);
+
+
     let mut passwords: Vec<String> = Vec::new();
 
     let mut archive = load_datastore(key)?;

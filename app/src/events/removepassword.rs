@@ -4,7 +4,21 @@ use crate::states::PasswordsState;
 
 #[derive(Debug)]
 pub struct RemovePasswordEvent {
-    name: String,
+    pub name: String,
+}
+
+impl RemovePasswordEvent {
+    pub fn from_json(json: &serde_json::Value) -> Option<Self> {
+        if json["type"] != "RemovePassword" {
+            return None;
+        }
+    
+        let name = json["name"].as_str()?;
+    
+        Some(Self {
+            name: name.to_string(),
+        })
+    }
 }
 
 impl Event<PasswordsState> for RemovePasswordEvent {
