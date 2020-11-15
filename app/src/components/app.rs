@@ -3,11 +3,12 @@ use iced::{Element, Sandbox};
 use crate::{
     clipboard::copy_value_to_clipboard,
     components::{AddPassword, EditPassword, Error, List, Unlock},
-    datastore::{load_state, save_state},
+    datastore::{append_event_to_eventlog, load_eventlog},
+    events::{AddPasswordEvent, ChangeNameEvent, ChangePasswordEvent, RemovePasswordEvent},
     messages::Messages,
+    states::{Password, PasswordsState},
     translations::{translate, Languages},
     views::Views,
-    events::{AddPasswordEvent, ChangeNameEvent, ChangePasswordEvent, RemovePasswordEvent},
 };
 
 use crypto::generate_key_from_seed;
@@ -58,7 +59,11 @@ impl Sandbox for App {
                 self.edit_view.update_input(input, value)
             }
             Messages::UnlockViewInputKeyChanged { value } => self.unlock_view.input_key = value,
-            Messages::UpdatePassword { entry, name, password } => self.update_password(entry, name, password),
+            Messages::UpdatePassword {
+                entry,
+                name,
+                password,
+            } => self.update_password(entry, name, password),
             Messages::GeneratePassphraseForAddView => self.add_view.generate_passphrase(),
         }
     }
@@ -119,39 +124,15 @@ impl App {
             return;
         }
 
-        let mut state = match load_state(&self.key) {
-            Ok(state) => state,
+        let event = AddPasswordEvent { name, password };
+
+        match append_event_to_eventlog(event.as_event(), &self.key) {
+            Ok(_) => {}
             Err(_) => {
                 self.change_view(Views::Error);
                 return;
             }
         };
-
-        
-
-        // let mut archive = match load_state(&self.key) {
-        //     Ok(archive) => archive,
-        //     Err(_) => {
-        //         self.change_view(Views::Error);
-        //         return;
-        //     }
-        // };
-
-        // match archive.add_entry(&name, password.as_bytes()) {
-        //     Ok(_) => {}
-        //     Err(_) => {
-        //         self.change_view(Views::Error);
-        //         return;
-        //     }
-        // }
-
-        // match save_datastore(&self.key, &mut archive) {
-        //     Ok(_) => {}
-        //     Err(_) => {
-        //         self.change_view(Views::Error);
-        //         return;
-        //     }
-        // }
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
@@ -198,34 +179,15 @@ impl App {
     }
 
     fn remove_password(&mut self, name: String) {
-        let event = RemovePasswordEvent {
-            name,
+        let event = RemovePasswordEvent { name };
+
+        match append_event_to_eventlog(event.as_event(), &self.key) {
+            Ok(_) => {}
+            Err(_) => {
+                self.change_view(Views::Error);
+                return;
+            }
         };
-
-        // save event to event log
-
-        // let mut archive = match load_datastore(&self.key) {
-        //     Ok(archive) => archive,
-        //     Err(_) => {
-        //         self.change_view(Views::Error);
-        //         return;
-        //     }
-        // };
-
-        // let entry = match archive.find_entry(&name) {
-        //     Ok(entry) => entry,
-        //     Err(_) => return,
-        // };
-
-        // match archive.remove_entry(&entry) {
-        //     Ok(_) => {}
-        //     Err(_) => return,
-        // };
-
-        // match save_datastore(&self.key, &mut archive) {
-        //     Ok(_) => {}
-        //     Err(_) => return,
-        // };
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
@@ -236,28 +198,40 @@ impl App {
     }
 
     fn update_password(&mut self, entry: String, name: String, password: String) {
-        let mut archive = match load_datastore(&self.key) {
-            Ok(archive) => archive,
-            Err(_) => {
-                self.change_view(Views::Error);
-                return;
-            }
+        let entry = match find_password(&self.key, &entry) {
+            Some(value) => value,
+            None => return,
         };
 
-        let entry = match archive.find_entry(&entry) {
-            Ok(entry) => entry,
-            Err(_) => return,
-        };
+        if entry.name != name {
+            let event = ChangeNameEvent {
+                name: entry.name,
+                new_name: name.clone(),
+            };
 
-        match archive.replace_entry(&entry, &name, password.as_bytes()) {
-            Ok(_) => {}
-            Err(_) => return,
-        };
+            match append_event_to_eventlog(event.as_event(), &self.key) {
+                Ok(_) => {}
+                Err(_) => {
+                    self.change_view(Views::Error);
+                    return;
+                }
+            };
+        }
 
-        match save_datastore(&self.key, &mut archive) {
-            Ok(_) => {}
-            Err(_) => return,
-        };
+        if entry.password != password {
+            let event = ChangePasswordEvent {
+                name: name.clone(),
+                new_password: password,
+            };
+    
+            match append_event_to_eventlog(event.as_event(), &self.key) {
+                Ok(_) => {}
+                Err(_) => {
+                    self.change_view(Views::Error);
+                    return;
+                }
+            };
+        }
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
@@ -268,11 +242,28 @@ impl App {
     }
 }
 
+fn find_password(key: &[u8], name: &str) -> Option<Password> {
+    let eventlog = match load_eventlog(key) {
+        Ok(value) => value,
+        Err(_) => return None,
+    };
+
+    let initial_state = PasswordsState::new();
+    let state = eventlog.project(initial_state);
+
+    let password = state
+        .passwords
+        .iter()
+        .find(|password| password.name == name)?;
+
+    Some(password.clone())
+}
+
 fn read_password(key: &[u8], name: &str) -> Result<String, Box<dyn std::error::Error>> {
-    let mut archive = load_datastore(key)?;
-    let entry = archive.find_entry(name)?;
+    let password = match find_password(key, name) {
+        Some(value) => value,
+        None => return Err(Box::from("Failed to find password")),
+    };
 
-    let data = archive.read_entry_data(&entry)?;
-
-    Ok(String::from_utf8(data)?)
+    Ok(password.password)
 }

@@ -1,15 +1,17 @@
+use std::error::Error;
 use iced::{button, scrollable, Align, Column, Container, Element, Length, Row, Scrollable, Text};
 
 use crate::{
     components::{create_button, Password},
-    datastore::load_state,
+    datastore::load_eventlog,
     messages::Messages,
     styles::HeaderStyle,
     translations::{translate, Languages},
     views::Views,
+    states::PasswordsState,
 };
 
-use std::error::Error;
+use event_sourcing::EventLog;
 
 pub struct List {
     pub key: [u8; 32],
@@ -88,13 +90,16 @@ impl List {
 }
 
 fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
-    let state = load_state(key)?;
+    let eventlog = load_eventlog(key).unwrap_or(EventLog::new());
 
-    let passwords = state
+    let initial_state = PasswordsState::new();
+    let state = eventlog.project(initial_state);
+
+    let mut passwords = state
         .passwords
         .iter()
-        .fold(vec![], |passwords, password| {
-            passwords.push(password.name);
+        .fold(vec![], |mut passwords, password| {
+            passwords.push(password.name.clone());
 
             passwords
         });

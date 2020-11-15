@@ -1,37 +1,38 @@
-use super::states::PasswordsState;
-use event_sourcing::JsonState;
-
 use std::error::Error;
 use std::fs::OpenOptions;
 use std::io::{Read, Write};
 use std::path::PathBuf;
 
-pub fn load_state(key: &[u8]) -> Result<PasswordsState, Box<dyn Error>> {
+use serde_json::{json, Value};
+
+use event_sourcing::{EventLog, Event};
+
+pub fn load_eventlog(key: &[u8]) -> Result<EventLog, Box<dyn Error>> {
     let filepath = PathBuf::from("./eventlog");
     let bytes = read_file_bytes(filepath)?;
     if bytes.is_empty() {
-        return Ok(PasswordsState::new());
+        return Err(Box::from("Failed to read any bytes from eventlog file"));
     }
 
-    let iv = crypto::generate_iv_from_seed("silly goose")?;
-    let bytes = crypto::decrypt(&bytes, key, &iv)?;
+    // let iv = crypto::generate_iv_from_seed("silly goose")?;
+    // let bytes = crypto::decrypt(&bytes, key, &iv)?;
 
     let json = std::str::from_utf8(&bytes)?;
     if json.is_empty() {
-        return Ok(PasswordsState::new());
+        return Err(Box::from("Failed to read bytes as json"));
     }
 
-    let state = PasswordsState::from_json(json.to_string());
+    let eventlog = parse_json_to_eventlog(json.to_string())?;
 
-    Ok(state)
+    Ok(eventlog)
 }
 
-pub fn save_state(state: PasswordsState, key: &[u8]) -> Result<(), Box<dyn Error>> {
-    let json = state.to_json();
+pub fn save_eventlog(eventlog: EventLog, key: &[u8]) -> Result<(), Box<dyn Error>> {
+    let json = parse_eventlog_to_json(&eventlog)?;
     let bytes = json.as_bytes();
 
-    let iv = crypto::generate_iv_from_seed("silly goose")?;
-    let bytes = crypto::encrypt(&bytes, key, &iv)?;
+    // let iv = crypto::generate_iv_from_seed("silly goose")?;
+    // let bytes = crypto::encrypt(&bytes, key, &iv)?;
 
     let filepath = PathBuf::from("./eventlog");
     save_file_bytes(filepath, &bytes)?;
@@ -39,31 +40,13 @@ pub fn save_state(state: PasswordsState, key: &[u8]) -> Result<(), Box<dyn Error
     Ok(())
 }
 
-// pub fn load_datastore(key: &[u8]) -> Result<MemoryArchive, Box<dyn Error>> {
-//     let filepath = PathBuf::from("./passwords");
-//     let bytes = read_file_bytes(filepath)?;
+pub fn append_event_to_eventlog(event: Event, key: &[u8]) -> Result<(), Box<dyn Error>> {
+    let mut eventlog = load_eventlog(key).unwrap_or(EventLog::new());
 
-//     let iv = crypto::generate_iv_from_seed("silly goose")?;
-//     let bytes = crypto::decrypt(&bytes, key, &iv)?;
+    eventlog.events.push(event);
 
-//     verify_decryption(&bytes)?;
-
-//     let archive = MemoryArchive::from(bytes);
-
-//     Ok(archive)
-// }
-
-// pub fn save_datastore(key: &[u8], archive: &mut MemoryArchive) -> Result<(), Box<dyn Error>> {
-//     let bytes = archive.as_bytes()?;
-
-//     let iv = crypto::generate_iv_from_seed("silly goose")?;
-//     let bytes = crypto::encrypt(&bytes, key, &iv)?;
-
-//     let filepath = PathBuf::from("./passwords");
-//     save_file_bytes(filepath, &bytes)?;
-
-//     Ok(())
-// }
+    save_eventlog(eventlog, key)
+}
 
 fn read_file_bytes(path: PathBuf) -> Result<Vec<u8>, Box<dyn Error>> {
     let mut file = OpenOptions::new()
@@ -91,20 +74,60 @@ fn save_file_bytes(path: PathBuf, bytes: &[u8]) -> Result<(), Box<dyn Error>> {
     Ok(())
 }
 
-// fn verify_decryption(bytes: &[u8]) -> Result<(), Box<dyn Error>> {
-//     if bytes.len() == 0 {
-//         return Ok(());
-//     }
+fn parse_json_to_eventlog(data: String) -> Result<EventLog, Box<dyn Error>> {
+    let json: Value = serde_json::from_str(&data)?;
 
-//     let verify_bytes: [u8; 8] = [
-//         bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6], bytes[7],
-//     ];
+    let entries = match json.as_array() {
+        Some(value) => value,
+        None => return Err(Box::from("failed to read json array")),
+    };
 
-//     let length = usize::from_be_bytes(verify_bytes);
+    let eventlog = entries
+        .iter()
+        .fold(EventLog::new(), |mut eventlog, event| {
+            let data: &Vec<Value> = match event["data"].as_array() {
+                Some(value) => value,
+                None => return eventlog,
+            };
 
-//     if length > 1024 {
-//         return Err(Box::from("failed to decrypt bytes"));
-//     }
+            let data = data
+                .iter()
+                .fold(vec![], |mut list, value| {
+                    let value = value.as_u64().unwrap();
+                    list.push(value as u8);
+                    list
+                });
 
-//     Ok(())
-// }
+            let event = Event {
+                event_type: event["event_type"].to_string(),
+                data,
+            };
+
+            eventlog.events.push(event);
+
+            eventlog
+        });
+
+    Ok(eventlog)
+}
+
+
+fn parse_eventlog_to_json(eventlog: &EventLog) -> Result<String, Box<dyn Error>> {
+    let events = eventlog
+        .events
+        .iter()
+        .fold(vec![], |mut list, event| {
+            let value: Value = json!({
+                "event_type": event.event_type,
+                "data": event.data,
+            });
+            list.push(value);
+            list
+        });
+
+    let value = Value::from(events);
+
+    let value = value.to_string();
+
+    Ok(value)
+}
