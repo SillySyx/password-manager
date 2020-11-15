@@ -1,13 +1,17 @@
 use crate::events::{AddPasswordEvent, ChangeNameEvent, ChangePasswordEvent, RemovePasswordEvent};
 use event_sourcing::{JsonState, Event, EventMode};
-use serde_json::Value;
 
+use serde_json::Value;
+use serde::Serialize;
+
+#[derive(Serialize)]
 #[derive(Debug, Clone)]
 pub struct Password {
     pub name: String,
     pub password: String,
 }
 
+#[derive(Serialize)]
 #[derive(Debug, Clone)]
 pub struct PasswordsState {
     pub passwords: Vec<Password>,
@@ -65,11 +69,9 @@ impl JsonState for PasswordsState {
     }
 
     fn to_json(&self) -> String {
-        // match serde_json::to_string(self) {
-        //     Ok(value) => value,
-        //     Err(_) => String::from(""),
-        // }
-        
-        todo!()
+        match serde_json::to_string(self) {
+            Ok(value) => value,
+            Err(_) => String::from(""),
+        }
     }
 }

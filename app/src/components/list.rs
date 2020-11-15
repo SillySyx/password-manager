@@ -2,7 +2,7 @@ use iced::{button, scrollable, Align, Column, Container, Element, Length, Row, S
 
 use crate::{
     components::{create_button, Password},
-    datastore::{load_datastore, load_state},
+    datastore::load_state,
     messages::Messages,
     styles::HeaderStyle,
     translations::{translate, Languages},
@@ -10,8 +10,6 @@ use crate::{
 };
 
 use std::error::Error;
-
-use glob::Archive;
 
 pub struct List {
     pub key: [u8; 32],
@@ -90,17 +88,16 @@ impl List {
 }
 
 fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
-    let test = load_state(key)?;
-    println!("{:?}", test);
+    let state = load_state(key)?;
 
+    let passwords = state
+        .passwords
+        .iter()
+        .fold(vec![], |passwords, password| {
+            passwords.push(password.name);
 
-    let mut passwords: Vec<String> = Vec::new();
-
-    let mut archive = load_datastore(key)?;
-
-    for entry in &archive.read_entries()? {
-        passwords.push(entry.name.clone());
-    }
+            passwords
+        });
 
     passwords.sort();
 

@@ -3,14 +3,14 @@ use iced::{Element, Sandbox};
 use crate::{
     clipboard::copy_value_to_clipboard,
     components::{AddPassword, EditPassword, Error, List, Unlock},
-    datastore::{load_datastore, save_datastore},
+    datastore::{load_state, save_state},
     messages::Messages,
     translations::{translate, Languages},
     views::Views,
+    events::{AddPasswordEvent, ChangeNameEvent, ChangePasswordEvent, RemovePasswordEvent},
 };
 
 use crypto::generate_key_from_seed;
-use glob::Archive;
 
 pub struct App {
     key: [u8; 32],
@@ -119,29 +119,39 @@ impl App {
             return;
         }
 
-        let mut archive = match load_datastore(&self.key) {
-            Ok(archive) => archive,
+        let mut state = match load_state(&self.key) {
+            Ok(state) => state,
             Err(_) => {
                 self.change_view(Views::Error);
                 return;
             }
         };
 
-        match archive.add_entry(&name, password.as_bytes()) {
-            Ok(_) => {}
-            Err(_) => {
-                self.change_view(Views::Error);
-                return;
-            }
-        }
+        
 
-        match save_datastore(&self.key, &mut archive) {
-            Ok(_) => {}
-            Err(_) => {
-                self.change_view(Views::Error);
-                return;
-            }
-        }
+        // let mut archive = match load_state(&self.key) {
+        //     Ok(archive) => archive,
+        //     Err(_) => {
+        //         self.change_view(Views::Error);
+        //         return;
+        //     }
+        // };
+
+        // match archive.add_entry(&name, password.as_bytes()) {
+        //     Ok(_) => {}
+        //     Err(_) => {
+        //         self.change_view(Views::Error);
+        //         return;
+        //     }
+        // }
+
+        // match save_datastore(&self.key, &mut archive) {
+        //     Ok(_) => {}
+        //     Err(_) => {
+        //         self.change_view(Views::Error);
+        //         return;
+        //     }
+        // }
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
@@ -188,28 +198,34 @@ impl App {
     }
 
     fn remove_password(&mut self, name: String) {
-        let mut archive = match load_datastore(&self.key) {
-            Ok(archive) => archive,
-            Err(_) => {
-                self.change_view(Views::Error);
-                return;
-            }
+        let event = RemovePasswordEvent {
+            name,
         };
 
-        let entry = match archive.find_entry(&name) {
-            Ok(entry) => entry,
-            Err(_) => return,
-        };
+        // save event to event log
 
-        match archive.remove_entry(&entry) {
-            Ok(_) => {}
-            Err(_) => return,
-        };
+        // let mut archive = match load_datastore(&self.key) {
+        //     Ok(archive) => archive,
+        //     Err(_) => {
+        //         self.change_view(Views::Error);
+        //         return;
+        //     }
+        // };
 
-        match save_datastore(&self.key, &mut archive) {
-            Ok(_) => {}
-            Err(_) => return,
-        };
+        // let entry = match archive.find_entry(&name) {
+        //     Ok(entry) => entry,
+        //     Err(_) => return,
+        // };
+
+        // match archive.remove_entry(&entry) {
+        //     Ok(_) => {}
+        //     Err(_) => return,
+        // };
+
+        // match save_datastore(&self.key, &mut archive) {
+        //     Ok(_) => {}
+        //     Err(_) => return,
+        // };
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
