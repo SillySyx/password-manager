@@ -191,7 +191,10 @@ impl App {
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
-            Err(_) => {}
+            Err(_) => {
+                self.change_view(Views::Error);
+                return;
+            }
         };
 
         self.change_view(Views::List);
@@ -235,7 +238,10 @@ impl App {
 
         match self.list_view.update_password_list() {
             Ok(_) => {}
-            Err(_) => {}
+            Err(_) => {
+                self.change_view(Views::Error);
+                return;
+            }
         };
 
         self.change_view(Views::List);

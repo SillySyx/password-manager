@@ -61,8 +61,8 @@ fn add_password(state: &PasswordsState, event: &Event) -> PasswordsState {
     };
 
     let password = Password {
-        name: data["name"].to_string(),
-        password: data["password"].to_string(),
+        name: data["name"].as_str().unwrap().to_string(),
+        password: data["password"].as_str().unwrap().to_string(),
     };
 
     state.passwords.push(password);
@@ -83,7 +83,7 @@ fn change_name(state: &PasswordsState, event: &Event) -> PasswordsState {
         None => return state,
     };
 
-    password.name = data["new_name"].to_string().clone();
+    password.name = data["new_name"].as_str().unwrap().to_string();
 
     state
 }
@@ -101,7 +101,7 @@ fn change_password(state: &PasswordsState, event: &Event) -> PasswordsState {
         None => return state,
     };
 
-    password.password = data["new_password"].to_string().clone();
+    password.password = data["new_password"].as_str().unwrap().to_string();
 
     state
 }
@@ -123,54 +123,3 @@ fn remove_password(state: &PasswordsState, event: &Event) -> PasswordsState {
 
     state
 }
-
-// impl JsonState for PasswordsState {
-//     fn from_json(json: String) -> Self {
-//         let json: Value = match serde_json::from_str(&json) {
-//             Ok(value) => value,
-//             Err(_) => return PasswordsState::new(),
-//         };
-
-//         let events = match json.as_array() {
-//             Some(value) => value,
-//             None => return PasswordsState::new(),
-//         };
-
-//         let state = events.iter().fold(PasswordsState::new(), |state, event| {
-//             if let Some(event) = AddPasswordEvent::from_json(event) {
-//                 if let Ok(new_state) = event.execute(state.clone(), EventMode::Replay) {
-//                     return new_state;
-//                 }
-//             }
-
-//             if let Some(event) = ChangeNameEvent::from_json(event) {
-//                 if let Ok(new_state) = event.execute(state.clone(), EventMode::Replay) {
-//                     return new_state;
-//                 }
-//             }
-
-//             if let Some(event) = ChangePasswordEvent::from_json(event) {
-//                 if let Ok(new_state) = event.execute(state.clone(), EventMode::Replay) {
-//                     return new_state;
-//                 }
-//             }
-
-//             if let Some(event) = RemovePasswordEvent::from_json(event) {
-//                 if let Ok(new_state) = event.execute(state.clone(), EventMode::Replay) {
-//                     return new_state;
-//                 }
-//             }
-
-//             state
-//         });
-
-//         state
-//     }
-
-//     fn to_json(&self) -> String {
-//         match serde_json::to_string(self) {
-//             Ok(value) => value,
-//             Err(_) => String::from(""),
-//         }
-//     }
-// }

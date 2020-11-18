@@ -11,15 +11,15 @@ pub fn load_eventlog(key: &[u8]) -> Result<EventLog, Box<dyn Error>> {
     let filepath = PathBuf::from("./eventlog");
     let bytes = read_file_bytes(filepath)?;
     if bytes.is_empty() {
-        return Err(Box::from("Failed to read any bytes from eventlog file"));
+        return Ok(EventLog::new());
     }
 
-    // let iv = crypto::generate_iv_from_seed("silly goose")?;
-    // let bytes = crypto::decrypt(&bytes, key, &iv)?;
+    let iv = crypto::generate_iv_from_seed("silly goose")?;
+    let bytes = crypto::decrypt(&bytes, key, &iv)?;
 
     let json = std::str::from_utf8(&bytes)?;
     if json.is_empty() {
-        return Err(Box::from("Failed to read bytes as json"));
+        return Ok(EventLog::new());
     }
 
     let eventlog = parse_json_to_eventlog(json.to_string())?;
@@ -31,8 +31,8 @@ pub fn save_eventlog(eventlog: EventLog, key: &[u8]) -> Result<(), Box<dyn Error
     let json = parse_eventlog_to_json(&eventlog)?;
     let bytes = json.as_bytes();
 
-    // let iv = crypto::generate_iv_from_seed("silly goose")?;
-    // let bytes = crypto::encrypt(&bytes, key, &iv)?;
+    let iv = crypto::generate_iv_from_seed("silly goose")?;
+    let bytes = crypto::encrypt(&bytes, key, &iv)?;
 
     let filepath = PathBuf::from("./eventlog");
     save_file_bytes(filepath, &bytes)?;
@@ -99,12 +99,11 @@ fn parse_json_to_eventlog(data: String) -> Result<EventLog, Box<dyn Error>> {
                 });
 
             let event = Event {
-                event_type: event["event_type"].to_string(),
+                event_type: event["event_type"].as_str().unwrap().to_string(),
                 data,
             };
 
             eventlog.events.push(event);
-
             eventlog
         });
 
