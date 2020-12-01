@@ -60,17 +60,20 @@ impl List {
             .fold(Column::new(), |list, (_, password)| {
                 list.push(password.view())
             })
-            .spacing(5);
+            .spacing(5)
+            .max_width(500);
 
-        let content_scroller = Scrollable::new(&mut self.scrollable_state).push(content);
+        let content_scroller = Scrollable::new(&mut self.scrollable_state)
+            .push(content)
+            .width(Length::Fill)
+            .align_items(Align::Center);
 
         let content_container = Container::new(content_scroller)
-            .max_width(500)
             .height(Length::Fill);
 
         Column::new()
             .align_items(Align::Center)
-            .spacing(20)
+            .spacing(5)
             .push(header_container)
             .push(content_container)
             .into()

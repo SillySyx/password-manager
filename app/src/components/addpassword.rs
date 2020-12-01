@@ -49,6 +49,7 @@ impl AddPassword {
     pub fn reset(&mut self) {
         self.name = String::new();
         self.password = String::new();
+        self.name_state.focus();
     }
 
     pub fn view(&mut self) -> Element<Messages> {
