@@ -13,6 +13,8 @@ mod events;
 
 use iced::{Sandbox, Settings};
 
-pub fn main() {
-    components::App::run(Settings::default())
+pub fn main() -> Result<(), Box<dyn std::error::Error>> {
+    components::App::run(Settings::default())?;
+
+    Ok(())
 }

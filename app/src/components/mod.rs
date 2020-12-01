@@ -16,7 +16,7 @@ pub use {
     edit::EditPassword,
 };
 
-pub fn create_button<'a, T>(
+pub fn create_button<'a, T: Clone>(
     state: &'a mut iced::button::State,
     text: &str,
     message: T,

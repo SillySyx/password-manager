@@ -8,7 +8,7 @@ impl container::StyleSheet for WidgetStyle {
     fn style(&self) -> container::Style {
         container::Style {
             background: Some(Background::Color(WIDGETBACKGROUND)),
-            border_radius: 10,
+            border_radius: 10.0,
             ..container::Style::default()
         }
     }

@@ -19,7 +19,11 @@ impl Unlock {
         Self {
             input_key: String::new(),
             button_state: button::State::new(),
-            input_state: text_input::State::new(),
+            input_state: {
+                let mut state = text_input::State::new();
+                state.focus();
+                state
+            },
         }
     }
 

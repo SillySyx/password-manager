@@ -29,7 +29,11 @@ impl AddPassword {
             add_button_state: button::State::new(),
             back_button_state: button::State::new(),
             passphrase_button_state: button::State::new(),
-            name_state: text_input::State::new(),
+            name_state: {
+                let mut state = text_input::State::new();
+                state.focus();
+                state
+            },
             password_state: text_input::State::new(),
         }
     }

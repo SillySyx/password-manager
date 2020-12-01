@@ -19,8 +19,8 @@ impl button::StyleSheet for MainStyle {
         button::Style {
             background: Some(Background::Color(BUTTONBACKGROUND)),
             text_color: TEXTCOLOR,
-            border_radius: 5,
-            border_width: 0,
+            border_radius: 5.0,
+            border_width: 0.0,
             ..button::Style::default()
         }
     }
