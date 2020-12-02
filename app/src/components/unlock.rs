@@ -63,6 +63,7 @@ impl Unlock {
         let button = create_button(
             &mut self.button_state,
             &translate(Languages::English, "unlock.unlock-button"),
+            "unlock.svg",
             Messages::UnlockApp { key: self.input_key.clone() }
         );
 

@@ -61,6 +61,7 @@ impl AddPassword {
         let back_button = create_button(
             &mut self.back_button_state,
             &translate(Languages::English, "add.back-button"),
+            "back.svg",
             Messages::ChangeView { view: Views::List },
         );
 
@@ -95,12 +96,14 @@ impl AddPassword {
         let add_button = create_button(
             &mut self.add_button_state,
             &translate(Languages::English, "add.add-button"),
+            "add.svg",
             Messages::AddPasswordMessage { name: self.name.clone(), password: self.password.clone() },
         );
 
         let generate_passphrase_button = create_button(
             &mut self.passphrase_button_state,
             &translate(Languages::English, "add.generate-button"),
+            "generate.svg",
             Messages::GeneratePassphraseForAddView,
         );
 

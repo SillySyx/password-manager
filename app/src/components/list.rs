@@ -38,6 +38,7 @@ impl List {
         let add_button = create_button(
             &mut self.add_button_state,
             &translate(Languages::English, "list.add-button"),
+            "add.svg",
             Messages::ChangeView { view: Views::AddPassword }
         );
 

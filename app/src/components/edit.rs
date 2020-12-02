@@ -60,6 +60,7 @@ impl EditPassword {
         let back_button = create_button(
             &mut self.back_button_state,
             &translate(Languages::English, "edit.back-button"),
+            "back.svg",
             Messages::ChangeView { view: Views::List }
         );
 
@@ -95,12 +96,14 @@ impl EditPassword {
         let save_button = create_button(
             &mut self.save_button_state,
             &translate(Languages::English, "edit.save-button"),
+            "add.svg",
             Messages::UpdatePassword { entry: self.entry.clone(), name: self.name.clone(), password: self.password.clone() }
         );
 
         let remove_button = create_button(
             &mut self.remove_button_state,
             &translate(Languages::English, "edit.remove-button"),
+            "trash.svg",
             Messages::RemovePassword { name: self.name.clone() }
         );
 

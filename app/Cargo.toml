@@ -6,7 +6,7 @@ edition = "2018"
 [dependencies]
 crypto = { path = "../crypto" }
 event-sourcing = { path = "../event-sourcing" }
-iced = "0.2"
+iced = { version = "0.2", features = ["svg"] }
 clipboard = "0.5.0"
 rand = "0.7.3"
 serde = { version = "1.0", features = ["derive"] }
