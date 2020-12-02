@@ -1,9 +1,8 @@
-use iced::{button, text_input, Column, Container, Element, Length, Row, Text, TextInput};
+use iced::{button, text_input, Column, Element, TextInput};
 
 use crate::{
-    components::{create_button, create_widget},
+    components::{create_button, create_widget, create_layout},
     messages::Messages,
-    styles::HeaderStyle,
     translations::{translate, Languages},
     views::Views,
 };
@@ -52,29 +51,13 @@ impl EditPassword {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header_title = Text::new(translate(Languages::English, "edit.header"))
-            .width(Length::Fill)
-            .vertical_alignment(iced::VerticalAlignment::Center)
-            .size(26);
-
         let back_button = create_button(
             &mut self.back_button_state,
             &translate(Languages::English, "edit.back-button"),
             "back.svg",
             Messages::ChangeView { view: Views::List }
-        );
-
-        let header_row = Row::new()
-            .max_width(500)
-            .height(Length::Units(35))
-            .push(header_title)
-            .push(back_button);
-
-        let header_container = Container::new(header_row)
-            .padding(10)
-            .width(Length::Fill)
-            .center_x()
-            .style(HeaderStyle);
+        )
+        .padding(5);
 
         let name_input = TextInput::new(
             &mut self.name_state,
@@ -116,15 +99,6 @@ impl EditPassword {
 
         let content = create_widget(content_column);
 
-        let content_container = Container::new(content)
-            .max_width(500)
-            .height(Length::Fill)
-            .center_y();
-
-        Column::new()
-            .align_items(iced::Align::Center)
-            .push(header_container)
-            .push(content_container)
-            .into()
+        create_layout(None, Some(back_button.into()), content.into()).into()
     }
 }

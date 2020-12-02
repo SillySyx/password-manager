@@ -1,9 +1,8 @@
-use iced::{button, text_input, Column, Container, Element, Length, Row, Text, TextInput};
+use iced::{button, text_input, Column, Element, Text, TextInput};
 
 use crate::{
-    components::{create_button, create_widget},
+    components::{create_button, create_widget, create_layout},
     messages::Messages,
-    styles::HeaderStyle,
     translations::{translate, Languages},
 };
 
@@ -32,23 +31,7 @@ impl Unlock {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header_title = Text::new(translate(Languages::English, "unlock.header"))
-            .width(Length::Fill)
-            .vertical_alignment(iced::VerticalAlignment::Center)
-            .size(26);
-
-        let header_row = Row::new()
-            .max_width(500)
-            .height(Length::Units(35))
-            .push(header_title);
-
-        let header_container = Container::new(header_row)
-            .padding(10)
-            .width(Length::Fill)
-            .center_x()
-            .style(HeaderStyle);
-
-        let description = Text::new(translate(Languages::English, "unlock.description")).size(16);
+        let description = Text::new(translate(Languages::English, "unlock.description")).size(18);
 
         let input = TextInput::new(
             &mut self.input_state,
@@ -75,15 +58,6 @@ impl Unlock {
 
         let content = create_widget(content_column);
 
-        let content_container = Container::new(content)
-            .max_width(500)
-            .height(Length::Fill)
-            .center_y();
-
-        Column::new()
-            .align_items(iced::Align::Center)
-            .push(header_container)
-            .push(content_container)
-            .into()
+        create_layout(None, None, content.into()).into()
     }
 }

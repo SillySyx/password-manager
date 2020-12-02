@@ -1,7 +1,7 @@
 use iced::{button, Element, Length, Row, Text};
 
 use crate::{
-    components::{create_button, create_widget},
+    components::create_button,
     messages::Messages,
     translations::{translate, Languages},
 };
@@ -44,14 +44,13 @@ impl Password {
         .padding(5);
 
         let row = Row::new()
+            .padding(10)
             .push(text)
             .push(copy_button)
             .push(edit_button)
             .spacing(5)
             .align_items(iced::Align::Center);
 
-        create_widget(row)
-            .padding(10)
-            .into()
+        row.into()
     }
 }

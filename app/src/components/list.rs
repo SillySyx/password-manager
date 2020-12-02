@@ -1,11 +1,10 @@
 use std::error::Error;
-use iced::{button, scrollable, Align, Column, Container, Element, Length, Row, Scrollable, Text};
+use iced::{button, scrollable, Align, Column, Container, Element, Length, Scrollable};
 
 use crate::{
-    components::{create_button, Password},
+    components::{create_button, create_layout, Password},
     datastore::load_eventlog,
     messages::Messages,
-    styles::HeaderStyle,
     translations::{translate, Languages},
     views::Views,
     states::PasswordsState,
@@ -30,29 +29,13 @@ impl List {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let header_title = Text::new(translate(Languages::English, "list.header"))
-            .width(Length::Fill)
-            .vertical_alignment(iced::VerticalAlignment::Center)
-            .size(26);
-
         let add_button = create_button(
             &mut self.add_button_state,
             &translate(Languages::English, "list.add-button"),
             "add.svg",
             Messages::ChangeView { view: Views::AddPassword }
-        );
-
-        let header_row = Row::new()
-            .max_width(500)
-            .height(Length::Units(35))
-            .push(header_title)
-            .push(add_button);
-
-        let header_container = Container::new(header_row)
-            .padding(10)
-            .width(Length::Fill)
-            .center_x()
-            .style(HeaderStyle);
+        )
+        .padding(5);
 
         let content = self
             .passwords
@@ -72,12 +55,7 @@ impl List {
         let content_container = Container::new(content_scroller)
             .height(Length::Fill);
 
-        Column::new()
-            .align_items(Align::Center)
-            .spacing(5)
-            .push(header_container)
-            .push(content_container)
-            .into()
+        create_layout(None, Some(add_button.into()), content_container.into()).into()
     }
 
     pub fn update_password_list(&mut self) -> Result<(), Box<dyn Error>> {

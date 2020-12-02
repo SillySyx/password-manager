@@ -1,7 +1,7 @@
-use iced::{Column, Container, Element, Length, Text};
+use iced::{Column, Element, Text};
 
 use crate::{
-    components::create_widget,
+    components::{create_widget, create_layout},
     messages::Messages,
     translations::{translate, Languages},
 };
@@ -20,17 +20,11 @@ impl Error {
 
         let content = Column::new()
             .spacing(20)
-            .max_width(500)
             .push(header)
             .push(description);
 
         let content = create_widget(content);
 
-        Container::new(content)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .center_x()
-            .center_y()
-            .into()
+        create_layout(None, None, content.into()).into()
     }
 }
