@@ -45,8 +45,8 @@ impl Password {
 
         let row = Row::new()
             .push(text)
-            .push(edit_button)
             .push(copy_button)
+            .push(edit_button)
             .spacing(5)
             .align_items(iced::Align::Center);
 
