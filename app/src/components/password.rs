@@ -30,7 +30,7 @@ impl Password {
         let edit_button = create_button(
             &mut self.edit_state,
             &translate(Languages::English, "password.edit-button"),
-            "menu.svg",
+            "cog.svg",
             Messages::EditPassword { name: self.name.clone() }
         )
         .padding(5);
