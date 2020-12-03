@@ -4,7 +4,7 @@ mod widget;
 mod linkbutton;
 
 pub use {
-    main::MainStyle,
+    main::{MainStyle, DangerStyle},
     header::HeaderStyle,
     widget::WidgetStyle,
     linkbutton::LinkButtonStyle,

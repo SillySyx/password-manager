@@ -107,7 +107,8 @@ impl EditPassword {
             Some(&translate(Languages::English, "edit.remove-button")),
             Some("trash.svg"),
             Messages::RemovePassword { name: self.name.clone() }
-        );
+        )
+        .style(crate::styles::DangerStyle);
 
         let back_button = create_button(
             &mut self.back_button_state,

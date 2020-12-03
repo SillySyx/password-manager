@@ -33,8 +33,8 @@ pub fn create_button<'a, T: Clone + 'static>(
     let container = match icon {
         Some(icon) => {
             let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
-                .width(Length::from(14))
-                .height(Length::from(14));
+                .width(Length::from(16))
+                .height(Length::from(16));
             container.push(svg)
         },
         None => container,
@@ -68,8 +68,8 @@ pub fn create_link_button<'a, T: Clone + 'static>(
     let container = match icon {
         Some(icon) => {
             let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
-                .width(Length::from(14))
-                .height(Length::from(14));
+                .width(Length::from(16))
+                .height(Length::from(16));
             container.push(svg)
         },
         None => container,
