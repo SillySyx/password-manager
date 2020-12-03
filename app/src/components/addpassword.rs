@@ -109,7 +109,11 @@ impl AddPassword {
             &mut self.add_button_state,
             Some(&translate(Languages::English, "add.add-button")),
             Some("add.svg"),
-            Messages::AddPasswordMessage { name: self.name.clone(), password: self.password.clone() },
+            Messages::AddPasswordMessage { 
+                name: self.name.clone(), 
+                description: self.description.clone(), 
+                password: self.password.clone(),
+            },
         );
 
         let back_button = create_button(

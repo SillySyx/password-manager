@@ -43,7 +43,6 @@ impl List {
             .fold(Column::new(), |list, (_, password)| {
                 list.push(password.view())
             })
-            .spacing(5)
             .max_width(500);
 
         let content_scroller = Scrollable::new(&mut self.scrollable_state)

@@ -37,6 +37,10 @@ impl State for PasswordsState {
             return change_name(self, event);
         }
 
+        if event.event_type == "ChangeDescription" {
+            return change_description(self, event);
+        }
+
         if event.event_type == "RemovePassword" {
             return remove_password(self, event);
         }
@@ -61,13 +65,26 @@ fn add_password(state: &PasswordsState, event: &Event) -> PasswordsState {
         Err(_) => return state,
     };
 
-    let password = Password {
-        name: data["name"].as_str().unwrap().to_string(),
-        description: String::from("ree"),
-        password: data["password"].as_str().unwrap().to_string(),
+    let name = match data["name"].as_str() {
+        Some(name) => name.to_string(),
+        None => String::new(),
     };
 
-    state.passwords.push(password);
+    let description = match data["description"].as_str() {
+        Some(description) => description.to_string(),
+        None => String::new(),
+    };
+
+    let password = match data["password"].as_str() {
+        Some(password) => password.to_string(),
+        None => String::new(),
+    };
+
+    state.passwords.push(Password {
+        name,
+        description,
+        password,
+    });
 
     state
 }
@@ -86,6 +103,24 @@ fn change_name(state: &PasswordsState, event: &Event) -> PasswordsState {
     };
 
     password.name = data["new_name"].as_str().unwrap().to_string();
+
+    state
+}
+
+fn change_description(state: &PasswordsState, event: &Event) -> PasswordsState {
+    let mut state = state.clone();
+
+    let data = match convert_event_data_to_json(event) {
+        Ok(value) => value,
+        Err(_) => return state,
+    };
+
+    let mut password = match state.passwords.iter_mut().find(|password| password.name == data["name"]) {
+        Some(value) => value,
+        None => return state,
+    };
+
+    password.description = data["new_description"].as_str().unwrap().to_string();
 
     state
 }

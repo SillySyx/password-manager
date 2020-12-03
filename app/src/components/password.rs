@@ -1,4 +1,4 @@
-use iced::{button, Element, Length, Column, Row, Text};
+use iced::{button, Element, Length, Column, Row, Text, Color};
 
 use crate::{
     components::create_link_button,
@@ -28,7 +28,7 @@ impl Password {
     pub fn view(&mut self) -> Element<Messages> {
         let text = Text::new(&self.name);
 
-        let description = Text::new(&self.description);
+        let description = Text::new(&self.description).color(Color::from_rgb(0.5, 0.5, 0.5));
 
         let column = Column::new()
             .width(Length::Fill)
@@ -50,7 +50,7 @@ impl Password {
         );
 
         let row = Row::new()
-            .padding(10)
+            .padding(5)
             .push(column)
             .push(copy_button)
             .push(edit_button)

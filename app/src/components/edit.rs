@@ -75,7 +75,7 @@ impl EditPassword {
             &mut self.description_state,
             "",
             &self.description,
-            |value| Messages::AddViewInputKeyChanged { input: "description", value },
+            |value| Messages::EditViewInputKeyChanged { input: "description", value },
         )
         .padding(10);
 
@@ -94,7 +94,12 @@ impl EditPassword {
             &mut self.save_button_state,
             Some(&translate(Languages::English, "edit.save-button")),
             Some("add.svg"),
-            Messages::UpdatePassword { entry: self.entry.clone(), name: self.name.clone(), password: self.password.clone() }
+            Messages::UpdatePassword { 
+                entry: self.entry.clone(), 
+                name: self.name.clone(), 
+                description: self.description.clone(), 
+                password: self.password.clone() 
+            }
         );
 
         let remove_button = create_button(
