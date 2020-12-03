@@ -1,30 +1,26 @@
 {
     "app.name": "Password Manager",
 
-    "unlock.header": "Unlock",
     "unlock.description": "Enter your masterkey to unlock the application data.",
-    "unlock.key-placeholder": "",
     "unlock.unlock-button": "Unlock",
 
-    "list.header": "Passwords",
-    "list.add-button": "Add",
+    "list.add-password": "Add password",
+    "list.add-category": "Add category",
 
-    "password.copy-button": "Copy",
-    "password.edit-button": "Edit",
-    
     "add.header": "Add password",
-    "add.name-placeholder": "Enter name",
-    "add.password-placeholder": "Enter password",
+    "add.name": "Name",
+    "add.description": "Description",
+    "add.password": "Password",
     "add.add-button": "Add",
     "add.back-button": "Back",
-    "add.generate-button": "Generate passphrase",
 
     "error.header": "An error occured",
     "error.description": "Invalid password specified",
     
     "edit.header": "Edit password",
-    "edit.name-placeholder": "Enter name",
-    "edit.password-placeholder": "Enter password",
+    "edit.name": "Name",
+    "edit.description": "Description",
+    "edit.password": "Password",
     "edit.save-button": "Save",
     "edit.back-button": "Back",
     "edit.remove-button": "Remove"

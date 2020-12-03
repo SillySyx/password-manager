@@ -1,51 +1,57 @@
-use iced::{button, Element, Length, Row, Text};
+use iced::{button, Element, Length, Column, Row, Text};
 
 use crate::{
-    components::create_button,
+    components::create_link_button,
     messages::Messages,
-    translations::{translate, Languages},
 };
 
 pub struct Password {
     pub key: [u8; 32],
     pub name: String,
+    pub description: String,
 
     edit_state: button::State,
     copy_state: button::State,
 }
 
 impl Password {
-    pub fn new(name: String, key: [u8; 32]) -> Self {
+    pub fn new(name: String, description: String, key: [u8; 32]) -> Self {
         Self {
             key,
             name,
+            description,
             edit_state: button::State::new(),
             copy_state: button::State::new(),
         }
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let text = Text::new(&self.name).width(Length::Fill);
+        let text = Text::new(&self.name);
 
-        let edit_button = create_button(
+        let description = Text::new(&self.description);
+
+        let column = Column::new()
+            .width(Length::Fill)
+            .push(text)
+            .push(description);
+
+        let edit_button = create_link_button(
             &mut self.edit_state,
-            &translate(Languages::English, "password.edit-button"),
-            "cog.svg",
+            None,
+            Some("cog.svg"),
             Messages::EditPassword { name: self.name.clone() }
-        )
-        .padding(5);
+        );
 
-        let copy_button = create_button(
+        let copy_button = create_link_button(
             &mut self.copy_state,
-            &translate(Languages::English, "password.copy-button"),
-            "key.svg",
+            None,
+            Some("key.svg"),
             Messages::CopyPassword { name: self.name.clone() }
-        )
-        .padding(5);
+        );
 
         let row = Row::new()
             .padding(10)
-            .push(text)
+            .push(column)
             .push(copy_button)
             .push(edit_button)
             .spacing(5)

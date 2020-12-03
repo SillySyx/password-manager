@@ -35,7 +35,7 @@ impl Unlock {
 
         let input = TextInput::new(
             &mut self.input_state,
-            &translate(Languages::English, "unlock.key-placeholder"),
+            "",
             &self.input_key,
             |value| Messages::UnlockViewInputKeyChanged { value }
         )
@@ -45,8 +45,8 @@ impl Unlock {
 
         let button = create_button(
             &mut self.button_state,
-            &translate(Languages::English, "unlock.unlock-button"),
-            "unlock.svg",
+            Some(&translate(Languages::English, "unlock.unlock-button")),
+            Some("unlock.svg"),
             Messages::UnlockApp { key: self.input_key.clone() }
         );
 

@@ -147,18 +147,19 @@ impl App {
 
     fn edit_password(&mut self, name: String) {
         self.edit_view.reset();
-        self.edit_view.entry = name.clone();
-        self.edit_view.name = name.clone();
 
-        let password = match read_password(&self.key, &name) {
-            Ok(value) => value,
-            Err(_) => {
+        let password = match find_password(&self.key, &name) {
+            Some(value) => value,
+            None => {
                 self.change_view(Views::Error);
                 return;
             }
         };
 
-        self.edit_view.password = password;
+        self.edit_view.entry = name.clone();
+        self.edit_view.name = password.name.clone();
+        self.edit_view.description = password.description.clone();
+        self.edit_view.password = password.password.clone();
 
         self.change_view(Views::Edit);
     }

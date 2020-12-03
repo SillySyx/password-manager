@@ -6,7 +6,7 @@ mod list;
 mod password;
 mod unlock;
 
-use iced::{Column, Length, Row, Element, Container, Align};
+use iced::{Column, Length, Row, Element, Container, Align, Text, Svg, Button, Space};
 
 pub use {
     app::App,
@@ -18,37 +18,79 @@ pub use {
     edit::EditPassword,
 };
 
-use super::styles::{HeaderStyle, WidgetStyle, MainStyle};
+use super::styles::{HeaderStyle, WidgetStyle, MainStyle, LinkButtonStyle};
 
 pub fn create_button<'a, T: Clone + 'static>(
     state: &'a mut iced::button::State,
-    text: &str,
-    icon: &str,
+    text: Option<&str>,
+    icon: Option<&str>,
     message: T,
-) -> iced::Button<'a, T> {
-    let text = iced::Text::new(text).size(16);
-
-    let svg = iced::Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
-        .width(iced::Length::from(14))
-        .height(iced::Length::from(14));
-
-    let container = iced::Row::new()
+) -> Button<'a, T> {
+    let container = Row::new()
         .align_items(Align::Center)
-        .spacing(5)
-        .push(svg)
-        .push(text);
+        .spacing(5);
 
-    let button = iced::Button::new(state, container)
+    let container = match icon {
+        Some(icon) => {
+            let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
+                .width(Length::from(14))
+                .height(Length::from(14));
+            container.push(svg)
+        },
+        None => container,
+    };
+
+    let container = match text {
+        Some(text) => {
+            let text = Text::new(text).size(16);
+            container.push(text)
+        },
+        None => container,
+    };
+
+    Button::new(state, container)
         .on_press(message)
         .padding(10)
-        .style(MainStyle);
-
-    button
+        .style(MainStyle)
 }
 
-pub fn create_widget<'a, T: 'static, C>(content: C) -> iced::Container<'a, T>
+
+pub fn create_link_button<'a, T: Clone + 'static>(
+    state: &'a mut iced::button::State,
+    text: Option<&str>,
+    icon: Option<&str>,
+    message: T,
+) -> Button<'a, T> {
+    let container = Row::new()
+        .align_items(Align::Center)
+        .spacing(5);
+
+    let container = match icon {
+        Some(icon) => {
+            let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
+                .width(Length::from(14))
+                .height(Length::from(14));
+            container.push(svg)
+        },
+        None => container,
+    };
+
+    let container = match text {
+        Some(text) => {
+            let text = Text::new(text).size(16);
+            container.push(text)
+        },
+        None => container,
+    };
+
+    Button::new(state, container)
+        .on_press(message)
+        .style(LinkButtonStyle)
+}
+
+pub fn create_widget<'a, T: 'static, C>(content: C) -> Container<'a, T>
 where
-    C: Into<iced::Element<'a, T>>,
+    C: Into<Element<'a, T>>,
 {
     let content = Container::new(content)
         .padding(20)
@@ -71,7 +113,7 @@ pub fn create_layout<'a, T: Clone + 'static>(
     let header_left = {
         let content = match header_left {
             Some(element) => element,
-            None => iced::Text::new("").into(),
+            None => Space::with_width(Length::Fill).into(),
         };
 
         Container::new(content)
@@ -81,7 +123,7 @@ pub fn create_layout<'a, T: Clone + 'static>(
     let header_right = {
         let content = match header_right {
             Some(element) => element,
-            None => iced::Text::new("").into(),
+            None => Space::with_width(Length::Fill).into(),
         };
 
         Container::new(content)
@@ -89,7 +131,7 @@ pub fn create_layout<'a, T: Clone + 'static>(
             .align_x(Align::End)
     };
 
-    let logo = iced::Svg::from_path(format!("{}/resources/icons/logo.svg", env!("CARGO_MANIFEST_DIR")))
+    let logo = Svg::from_path(format!("{}/resources/icons/logo.svg", env!("CARGO_MANIFEST_DIR")))
         .width(Length::from(30))
         .height(Length::from(30));
 

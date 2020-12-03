@@ -7,6 +7,7 @@ use serde_json::Value;
 pub struct Password {
     pub name: String,
     pub password: String,
+    pub description: String,
 }
 
 #[derive(Debug, Clone)]
@@ -62,6 +63,7 @@ fn add_password(state: &PasswordsState, event: &Event) -> PasswordsState {
 
     let password = Password {
         name: data["name"].as_str().unwrap().to_string(),
+        description: String::from("ree"),
         password: data["password"].as_str().unwrap().to_string(),
     };
 

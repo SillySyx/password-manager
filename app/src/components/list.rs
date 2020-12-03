@@ -2,7 +2,7 @@ use std::error::Error;
 use iced::{button, scrollable, Align, Column, Container, Element, Length, Scrollable};
 
 use crate::{
-    components::{create_button, create_layout, Password},
+    components::{create_link_button, create_layout, Password},
     datastore::load_eventlog,
     messages::Messages,
     translations::{translate, Languages},
@@ -29,13 +29,12 @@ impl List {
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let add_button = create_button(
+        let add_button = create_link_button(
             &mut self.add_button_state,
-            &translate(Languages::English, "list.add-button"),
-            "add.svg",
+            Some(&translate(Languages::English, "list.add-password")),
+            Some("add.svg"),
             Messages::ChangeView { view: Views::AddPassword }
-        )
-        .padding(5);
+        );
 
         let content = self
             .passwords
@@ -62,14 +61,15 @@ impl List {
         self.passwords.clear();
 
         for password in list_passwords(&self.key)? {
-            self.passwords.push(Password::new(password, self.key));
+            let (name, description) = password;
+            self.passwords.push(Password::new(name, description, self.key));
         }
 
         Ok(())
     }
 }
 
-fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
+fn list_passwords(key: &[u8]) -> Result<Vec<(String, String)>, Box<dyn Error>> {
     let eventlog = load_eventlog(key)?;
 
     let initial_state = PasswordsState::new();
@@ -79,7 +79,7 @@ fn list_passwords(key: &[u8]) -> Result<Vec<String>, Box<dyn Error>> {
         .passwords
         .iter()
         .fold(vec![], |mut passwords, password| {
-            passwords.push(password.name.clone());
+            passwords.push((password.name.clone(), password.description.clone()));
 
             passwords
         });
