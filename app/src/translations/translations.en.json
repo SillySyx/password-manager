@@ -5,11 +5,11 @@
     "unlock.unlock-button": "Unlock",
 
     "list.add-password": "Add password",
-    "list.add-category": "Add category",
 
     "add.header": "Add password",
     "add.name": "Name",
     "add.description": "Description",
+    "add.category": "Category",
     "add.password": "Password",
     "add.add-button": "Add",
     "add.back-button": "Back",
@@ -20,6 +20,7 @@
     "edit.header": "Edit password",
     "edit.name": "Name",
     "edit.description": "Description",
+    "edit.category": "Category",
     "edit.password": "Password",
     "edit.save-button": "Save",
     "edit.back-button": "Back",

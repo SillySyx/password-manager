@@ -1,39 +1,44 @@
-use iced::{button, Element, Length, Column, Row, Text, Color};
+use iced::{button, Element, Length, Row, Container, Align};
 
 use crate::{
     components::create_link_button,
     messages::Messages,
+    styles::PasswordStyle,
 };
 
 pub struct Password {
-    pub key: [u8; 32],
     pub name: String,
     pub description: String,
+    pub category: String,
 
+    text_state: button::State,
     edit_state: button::State,
     copy_state: button::State,
 }
 
 impl Password {
-    pub fn new(name: String, description: String, key: [u8; 32]) -> Self {
+    pub fn new(name: String, description: String, category: String) -> Self {
         Self {
-            key,
             name,
             description,
+            category,
+            text_state: button::State::new(),
             edit_state: button::State::new(),
             copy_state: button::State::new(),
         }
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let text = Text::new(&self.name);
+        let text_button = create_link_button(
+            &mut self.text_state,
+            Some(&self.name),
+            None,
+            Messages::EditPassword { name: self.name.clone() }
+        )
+        .style(PasswordStyle);
 
-        let description = Text::new(&self.description).color(Color::from_rgb(0.5, 0.5, 0.5));
-
-        let column = Column::new()
-            .width(Length::Fill)
-            .push(text)
-            .push(description);
+        let text_container = Container::new(text_button)
+            .width(Length::Fill);
 
         let edit_button = create_link_button(
             &mut self.edit_state,
@@ -50,13 +55,15 @@ impl Password {
         );
 
         let row = Row::new()
-            .padding(5)
-            .push(column)
+            .push(text_container)
             .push(copy_button)
             .push(edit_button)
             .spacing(5)
-            .align_items(iced::Align::Center);
+            .align_items(Align::Center);
 
-        row.into()
+        Container::new(row)
+            .padding(5)
+            .style(PasswordStyle)
+            .into()
     }
 }

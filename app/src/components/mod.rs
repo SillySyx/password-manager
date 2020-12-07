@@ -4,6 +4,7 @@ mod edit;
 mod error;
 mod list;
 mod password;
+mod category;
 mod unlock;
 
 use iced::{Column, Length, Row, Element, Container, Align, Text, Svg, Button, Space};
@@ -16,6 +17,7 @@ pub use {
     addpassword::AddPassword,
     error::Error,
     edit::EditPassword,
+    category::Category,
 };
 
 use super::styles::{HeaderStyle, WidgetStyle, MainStyle, LinkButtonStyle};
@@ -77,7 +79,7 @@ pub fn create_link_button<'a, T: Clone + 'static>(
 
     let container = match text {
         Some(text) => {
-            let text = Text::new(text).size(16);
+            let text = Text::new(text);
             container.push(text)
         },
         None => container,

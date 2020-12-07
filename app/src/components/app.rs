@@ -61,6 +61,7 @@ impl Sandbox for App {
             Messages::UnlockViewInputKeyChanged { value } => self.unlock_view.input_key = value,
             Messages::UpdatePassword { entry, name, description, category, password} => self.update_password(entry, name, description, category, password),
             Messages::GeneratePassphraseForAddView => self.add_view.generate_passphrase(),
+            Messages::ToggleCategory { name } => self.list_view.toggle_category(name),
         }
     }
 

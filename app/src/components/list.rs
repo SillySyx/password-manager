@@ -1,8 +1,8 @@
 use std::error::Error;
-use iced::{button, scrollable, Align, Column, Container, Element, Length, Scrollable};
+use iced::{button, scrollable, Row, Element, Length, Scrollable};
 
 use crate::{
-    components::{create_link_button, create_layout, Password},
+    components::{create_link_button, create_layout, Password, Category},
     datastore::load_eventlog,
     messages::Messages,
     translations::{translate, Languages},
@@ -13,8 +13,11 @@ use crate::{
 pub struct List {
     pub key: [u8; 32],
     passwords: Vec<Password>,
+    categories: Vec<Category>,
+    selected_category: Option<String>,
 
-    scrollable_state: scrollable::State,
+    categories_state: scrollable::State,
+    passwords_state: scrollable::State,
     add_button_state: button::State,
 }
 
@@ -23,7 +26,10 @@ impl List {
         Self {
             key: [0; 32],
             passwords: vec![],
-            scrollable_state: scrollable::State::new(),
+            categories: vec![],
+            selected_category: None,
+            categories_state: scrollable::State::new(),
+            passwords_state: scrollable::State::new(),
             add_button_state: button::State::new(),
         }
     }
@@ -36,54 +42,90 @@ impl List {
             Messages::ChangeView { view: Views::AddPassword }
         );
 
-        let content = self
-            .passwords
+        let categories_container = self.categories
             .iter_mut()
-            .enumerate()
-            .fold(Column::new(), |list, (_, password)| {
-                list.push(password.view())
+            .fold(Scrollable::new(&mut self.categories_state), |container, category| {
+                container.push(category.view())
             })
-            .max_width(500);
+            .spacing(5)
+            .padding(5);
 
-        let content_scroller = Scrollable::new(&mut self.scrollable_state)
-            .push(content)
-            .width(Length::Fill)
-            .align_items(Align::Center);
+        let passwords_container = self.passwords
+            .iter_mut()
+            .fold(Scrollable::new(&mut self.passwords_state), |container, password| {
+                container.push(password.view())
+            })
+            .spacing(5)
+            .padding(5);
 
-        let content_container = Container::new(content_scroller)
-            .height(Length::Fill);
+        let content_container = Row::new()
+            .height(Length::Fill)
+            .push(categories_container)
+            .push(passwords_container);
 
         create_layout(None, Some(add_button.into()), content_container.into()).into()
     }
 
     pub fn update_password_list(&mut self) -> Result<(), Box<dyn Error>> {
-        self.passwords.clear();
+        let passwords = list_passwords(self.key)?;
+        
+        self.categories = read_categories_from_passwords(&passwords);
 
-        for password in list_passwords(&self.key)? {
-            let (name, description) = password;
-            self.passwords.push(Password::new(name, description, self.key));
-        }
+        self.passwords = filter_passwords_based_on_selected_category(passwords, self.selected_category.clone());
 
         Ok(())
     }
+
+    pub fn toggle_category(&mut self, name: String) {
+        if let Some(selected_category) = self.selected_category.clone() {
+            if selected_category == name {
+                self.selected_category = None;
+                self.update_password_list().expect("failed to update list");
+                return;
+            }
+        }
+
+        self.selected_category = Some(name);
+        self.update_password_list().expect("failed to update list");
+    }
 }
 
-fn list_passwords(key: &[u8]) -> Result<Vec<(String, String)>, Box<dyn Error>> {
-    let eventlog = load_eventlog(key)?;
+fn list_passwords(key: [u8; 32]) -> Result<Vec<Password>, Box<dyn Error>> {
+    let eventlog = load_eventlog(&key)?;
 
     let initial_state = PasswordsState::new();
     let state = eventlog.project(initial_state);
 
-    let mut passwords = state
-        .passwords
+    let mut passwords: Vec<Password> = state.passwords
         .iter()
-        .fold(vec![], |mut passwords, password| {
-            passwords.push((password.name.clone(), password.description.clone()));
+        .map(|password| Password::new(password.name.clone(), password.description.clone(), password.category.clone()))
+        .collect();
 
-            passwords
-        });
-
-    passwords.sort();
+    passwords.sort_by_key(|password| password.name.to_lowercase());
 
     Ok(passwords)
+}
+
+fn read_categories_from_passwords(passwords: &[Password]) -> Vec<Category> {
+    let mut categories: Vec<Category> = passwords
+        .iter()
+        .filter(|password| !password.category.is_empty())
+        .map(|password| Category::new(password.category.clone()))
+        .collect();
+
+    categories.sort_by_key(|category| category.name.to_lowercase());
+    categories.dedup_by_key(|category| category.name.clone());
+
+    categories
+}
+
+fn filter_passwords_based_on_selected_category(passwords: Vec<Password>, selected_category: Option<String>) -> Vec<Password> {
+    if let Some(selected_category) = selected_category {
+        return passwords
+            .into_iter()
+            .filter(|password| password.category == selected_category)
+            .collect();
+    }
+
+    passwords
 }
