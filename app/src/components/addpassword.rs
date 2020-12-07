@@ -11,6 +11,7 @@ use crate::{
 pub struct AddPassword {
     pub name: String,
     pub description: String,
+    pub category: String,
     pub password: String,
 
     add_button_state: button::State,
@@ -18,6 +19,7 @@ pub struct AddPassword {
     passphrase_button_state: button::State,
     name_state: text_input::State,
     description_state: text_input::State,
+    category_state: text_input::State,
     password_state: text_input::State,
 }
 
@@ -26,6 +28,7 @@ impl AddPassword {
         Self {
             name: String::new(),
             description: String::new(),
+            category: String::new(),
             password: String::new(),
 
             add_button_state: button::State::new(),
@@ -37,6 +40,7 @@ impl AddPassword {
                 state
             },
             description_state: text_input::State::new(),
+            category_state: text_input::State::new(),
             password_state: text_input::State::new(),
         }
     }
@@ -46,6 +50,7 @@ impl AddPassword {
             "name" => self.name = value,
             "password" => self.password = value,
             "description" => self.description = value,
+            "category" => self.category = value,
             _ => {}
         };
     }
@@ -53,6 +58,7 @@ impl AddPassword {
     pub fn reset(&mut self) {
         self.name = String::new();
         self.description = String::new();
+        self.category = String::new();
         self.password = String::new();
         self.name_state.focus();
     }
@@ -78,6 +84,16 @@ impl AddPassword {
             "",
             &self.description,
             |value| Messages::AddViewInputKeyChanged { input: "description", value },
+        )
+        .padding(10);
+
+        let category_title = Text::new(&translate(Languages::English, "add.category"));
+
+        let category_input = TextInput::new(
+            &mut self.category_state,
+            "",
+            &self.category,
+            |value| Messages::AddViewInputKeyChanged { input: "category", value },
         )
         .padding(10);
 
@@ -112,6 +128,7 @@ impl AddPassword {
             Messages::AddPasswordMessage { 
                 name: self.name.clone(), 
                 description: self.description.clone(), 
+                category: self.category.clone(),
                 password: self.password.clone(),
             },
         );
@@ -135,6 +152,8 @@ impl AddPassword {
             .push(name_input)
             .push(description_title)
             .push(description_input)
+            .push(category_title)
+            .push(category_input)
             .push(password_title)
             .push(password_row)
             .push(button_row);

@@ -4,9 +4,9 @@ use crate::views::Views;
 pub enum Messages {
     ChangeView { view: Views },
     UnlockApp { key: String },
-    AddPasswordMessage { name: String, description: String, password: String },
+    AddPasswordMessage { name: String, description: String, category: String, password: String },
     EditPassword { name: String },
-    UpdatePassword { entry: String, name: String, description: String, password: String },
+    UpdatePassword { entry: String, name: String, description: String, category: String, password: String },
     CopyPassword { name: String },
     RemovePassword { name: String },
     GeneratePassphraseForAddView,

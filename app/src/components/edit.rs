@@ -11,6 +11,7 @@ pub struct EditPassword {
     pub entry: String,
     pub name: String,
     pub description: String,
+    pub category: String,
     pub password: String,
 
     save_button_state: button::State,
@@ -19,6 +20,7 @@ pub struct EditPassword {
 
     name_state: text_input::State,
     description_state: text_input::State,
+    category_state: text_input::State,
     password_state: text_input::State,
 }
 
@@ -28,6 +30,7 @@ impl EditPassword {
             entry: String::new(),
             name: String::new(),
             description: String::new(),
+            category: String::new(),
             password: String::new(),
 
             save_button_state: button::State::new(),
@@ -36,6 +39,7 @@ impl EditPassword {
 
             name_state: text_input::State::new(),
             description_state: text_input::State::new(),
+            category_state: text_input::State::new(),
             password_state: text_input::State::new(),
         }
     }
@@ -45,6 +49,7 @@ impl EditPassword {
             "name" => self.name = value,
             "password" => self.password = value,
             "description" => self.description = value,
+            "category" => self.category = value,
             _ => {}
         };
     }
@@ -52,6 +57,8 @@ impl EditPassword {
     pub fn reset(&mut self) {
         self.entry = String::new();
         self.name = String::new();
+        self.description = String::new();
+        self.category = String::new();
         self.password = String::new();
     }
 
@@ -79,6 +86,16 @@ impl EditPassword {
         )
         .padding(10);
 
+        let category_title = Text::new(&translate(Languages::English, "edit.category"));
+
+        let category_input = TextInput::new(
+            &mut self.category_state,
+            "",
+            &self.category,
+            |value| Messages::EditViewInputKeyChanged { input: "category", value },
+        )
+        .padding(10);
+
         let password_title = Text::new(&translate(Languages::English, "edit.password"));
 
         let password_input = TextInput::new(
@@ -98,7 +115,8 @@ impl EditPassword {
                 entry: self.entry.clone(), 
                 name: self.name.clone(), 
                 description: self.description.clone(), 
-                password: self.password.clone() 
+                password: self.password.clone(),
+                category: self.category.clone(),
             }
         );
 
@@ -129,6 +147,8 @@ impl EditPassword {
             .push(name_input)
             .push(description_title)
             .push(description_input)
+            .push(category_title)
+            .push(category_input)
             .push(password_title)
             .push(password_input)
             .push(button_row)

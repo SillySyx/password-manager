@@ -4,7 +4,7 @@ use crate::{
     clipboard::copy_value_to_clipboard,
     components::{AddPassword, EditPassword, Error, List, Unlock},
     datastore::{append_event_to_eventlog, load_eventlog},
-    events::{AddPasswordEvent, ChangeNameEvent, ChangeDescriptionEvent, ChangePasswordEvent, RemovePasswordEvent},
+    events::{AddPasswordEvent, ChangeNameEvent, ChangeDescriptionEvent, ChangeCategoryEvent, ChangePasswordEvent, RemovePasswordEvent},
     messages::Messages,
     states::{Password, PasswordsState},
     translations::{translate, Languages},
@@ -48,7 +48,7 @@ impl Sandbox for App {
         match message {
             Messages::ChangeView { view } => self.change_view(view),
             Messages::UnlockApp { key } => self.unlock_app(key),
-            Messages::AddPasswordMessage { name, description, password } => self.add_password(name, description, password),
+            Messages::AddPasswordMessage { name, description, category, password } => self.add_password(name, description, category, password),
             Messages::EditPassword { name } => self.edit_password(name),
             Messages::CopyPassword { name } => self.copy_password(name),
             Messages::RemovePassword { name } => self.remove_password(name),
@@ -59,7 +59,7 @@ impl Sandbox for App {
                 self.edit_view.update_input(input, value)
             }
             Messages::UnlockViewInputKeyChanged { value } => self.unlock_view.input_key = value,
-            Messages::UpdatePassword { entry, name, description, password} => self.update_password(entry, name, description, password),
+            Messages::UpdatePassword { entry, name, description, category, password} => self.update_password(entry, name, description, category, password),
             Messages::GeneratePassphraseForAddView => self.add_view.generate_passphrase(),
         }
     }
@@ -111,7 +111,7 @@ impl App {
         };
     }
 
-    fn add_password(&mut self, name: String, description: String, password: String) {
+    fn add_password(&mut self, name: String, description: String, category: String, password: String) {
         if name.is_empty() {
             return;
         }
@@ -120,7 +120,7 @@ impl App {
             return;
         }
 
-        let event = AddPasswordEvent { name, description, password };
+        let event = AddPasswordEvent { name, description, category, password };
 
         match append_event_to_eventlog(event.as_event(), &self.key) {
             Ok(_) => {}
@@ -155,6 +155,7 @@ impl App {
         self.edit_view.entry = name.clone();
         self.edit_view.name = password.name.clone();
         self.edit_view.description = password.description.clone();
+        self.edit_view.category = password.category.clone();
         self.edit_view.password = password.password.clone();
 
         self.change_view(Views::Edit);
@@ -197,7 +198,7 @@ impl App {
         self.change_view(Views::List);
     }
 
-    fn update_password(&mut self, entry: String, name: String, description: String, password: String) {
+    fn update_password(&mut self, entry: String, name: String, description: String, category: String, password: String) {
         let entry = match find_password(&self.key, &entry) {
             Some(value) => value,
             None => return,
@@ -222,6 +223,21 @@ impl App {
             let event = ChangeDescriptionEvent {
                 name: entry.name.clone(),
                 new_description: description.clone(),
+            };
+
+            match append_event_to_eventlog(event.as_event(), &self.key) {
+                Ok(_) => {}
+                Err(_) => {
+                    self.change_view(Views::Error);
+                    return;
+                }
+            };
+        }
+
+        if entry.category != category {
+            let event = ChangeCategoryEvent {
+                name: entry.name.clone(),
+                new_category: category.clone(),
             };
 
             match append_event_to_eventlog(event.as_event(), &self.key) {

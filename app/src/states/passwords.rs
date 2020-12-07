@@ -8,6 +8,7 @@ pub struct Password {
     pub name: String,
     pub password: String,
     pub description: String,
+    pub category: String,
 }
 
 #[derive(Debug, Clone)]
@@ -39,6 +40,10 @@ impl State for PasswordsState {
 
         if event.event_type == "ChangeDescription" {
             return change_description(self, event);
+        }
+
+        if event.event_type == "ChangeCategory" {
+            return change_category(self, event);
         }
 
         if event.event_type == "RemovePassword" {
@@ -80,10 +85,16 @@ fn add_password(state: &PasswordsState, event: &Event) -> PasswordsState {
         None => String::new(),
     };
 
+    let category = match data["category"].as_str() {
+        Some(category) => category.to_string(),
+        None => String::new(),
+    };
+
     state.passwords.push(Password {
         name,
         description,
         password,
+        category,
     });
 
     state
@@ -97,12 +108,17 @@ fn change_name(state: &PasswordsState, event: &Event) -> PasswordsState {
         Err(_) => return state,
     };
 
+    let new_name = match data["new_name"].as_str() {
+        Some(name) => name.to_string(),
+        None => return state,
+    };
+
     let mut password = match state.passwords.iter_mut().find(|password| password.name == data["name"]) {
         Some(value) => value,
         None => return state,
     };
 
-    password.name = data["new_name"].as_str().unwrap().to_string();
+    password.name = new_name;
 
     state
 }
@@ -115,12 +131,40 @@ fn change_description(state: &PasswordsState, event: &Event) -> PasswordsState {
         Err(_) => return state,
     };
 
+    let new_description = match data["new_description"].as_str() {
+        Some(description) => description.to_string(),
+        None => return state,
+    };
+
     let mut password = match state.passwords.iter_mut().find(|password| password.name == data["name"]) {
         Some(value) => value,
         None => return state,
     };
 
-    password.description = data["new_description"].as_str().unwrap().to_string();
+    password.description = new_description;
+
+    state
+}
+
+fn change_category(state: &PasswordsState, event: &Event) -> PasswordsState {
+    let mut state = state.clone();
+
+    let data = match convert_event_data_to_json(event) {
+        Ok(value) => value,
+        Err(_) => return state,
+    };
+
+    let new_category = match data["new_category"].as_str() {
+        Some(category) => category.to_string(),
+        None => return state,
+    };
+
+    let mut password = match state.passwords.iter_mut().find(|password| password.name == data["name"]) {
+        Some(value) => value,
+        None => return state,
+    };
+
+    password.category = new_category;
 
     state
 }
@@ -133,12 +177,17 @@ fn change_password(state: &PasswordsState, event: &Event) -> PasswordsState {
         Err(_) => return state,
     };
 
+    let new_password = match data["new_password"].as_str() {
+        Some(password) => password.to_string(),
+        None => return state,
+    };
+
     let mut password = match state.passwords.iter_mut().find(|password| password.name == data["name"]) {
         Some(value) => value,
         None => return state,
     };
 
-    password.password = data["new_password"].as_str().unwrap().to_string();
+    password.password = new_password;
 
     state
 }
