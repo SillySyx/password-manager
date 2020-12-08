@@ -67,7 +67,8 @@ impl AddPassword {
         let header = Text::new(&translate(Languages::English, "add.header"))
             .size(30);
         
-        let name_title = Text::new(&translate(Languages::English, "add.name"));
+        let name_title = Text::new(&translate(Languages::English, "add.name"))
+            .size(18);
 
         let name_input = TextInput::new(
             &mut self.name_state,
@@ -77,7 +78,8 @@ impl AddPassword {
         )
         .padding(10);
 
-        let description_title = Text::new(&translate(Languages::English, "add.description"));
+        let description_title = Text::new(&translate(Languages::English, "add.description"))
+            .size(18);
 
         let description_input = TextInput::new(
             &mut self.description_state,
@@ -87,7 +89,8 @@ impl AddPassword {
         )
         .padding(10);
 
-        let category_title = Text::new(&translate(Languages::English, "add.category"));
+        let category_title = Text::new(&translate(Languages::English, "add.category"))
+            .size(18);
 
         let category_input = TextInput::new(
             &mut self.category_state,
@@ -97,7 +100,8 @@ impl AddPassword {
         )
         .padding(10);
 
-        let password_title = Text::new(&translate(Languages::English, "add.password"));
+        let password_title = Text::new(&translate(Languages::English, "add.password"))
+            .size(18);
 
         let password_input = TextInput::new(
             &mut self.password_state,
@@ -114,7 +118,7 @@ impl AddPassword {
             Some("generate.svg"),
             Messages::GeneratePassphraseForAddView,
         )
-        .padding(13);
+        .padding(12);
 
         let password_row = Row::new()
             .spacing(5)
@@ -150,10 +154,10 @@ impl AddPassword {
             .push(header)
             .push(name_title)
             .push(name_input)
-            .push(description_title)
-            .push(description_input)
             .push(category_title)
             .push(category_input)
+            .push(description_title)
+            .push(description_input)
             .push(password_title)
             .push(password_row)
             .push(button_row);

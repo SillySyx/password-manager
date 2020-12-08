@@ -6,6 +6,7 @@ use crate::{
     styles::PasswordStyle,
 };
 
+#[derive(Clone)]
 pub struct Password {
     pub name: String,
     pub description: String,

@@ -8,6 +8,7 @@ pub enum Messages {
     EditPassword { name: String },
     UpdatePassword { entry: String, name: String, description: String, category: String, password: String },
     CopyPassword { name: String },
+    CopyDescription { name: String },
     RemovePassword { name: String },
     ToggleCategory { name: String },
     GeneratePassphraseForAddView,

@@ -51,6 +51,7 @@ impl Sandbox for App {
             Messages::AddPasswordMessage { name, description, category, password } => self.add_password(name, description, category, password),
             Messages::EditPassword { name } => self.edit_password(name),
             Messages::CopyPassword { name } => self.copy_password(name),
+            Messages::CopyDescription { name } => self.copy_description(name),
             Messages::RemovePassword { name } => self.remove_password(name),
             Messages::AddViewInputKeyChanged { input, value } => {
                 self.add_view.update_input(input, value)
@@ -172,6 +173,21 @@ impl App {
         };
 
         match copy_value_to_clipboard(password) {
+            Ok(_) => {}
+            Err(_) => {}
+        };
+    }
+
+    fn copy_description(&mut self, name: String) {
+        let entry = match find_password(&self.key, &name) {
+            Some(value) => value,
+            None => {
+                self.change_view(Views::Error);
+                return;
+            },
+        };
+
+        match copy_value_to_clipboard(entry.description) {
             Ok(_) => {}
             Err(_) => {}
         };

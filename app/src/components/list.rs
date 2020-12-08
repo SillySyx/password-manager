@@ -1,5 +1,5 @@
 use std::error::Error;
-use iced::{button, scrollable, Row, Element, Length, Scrollable};
+use iced::{Element, Length, Row, Scrollable, button, scrollable};
 
 use crate::{
     components::{create_link_button, create_layout, Password, Category},
@@ -55,13 +55,15 @@ impl List {
             .spacing(5)
             .padding(5);
 
-        let passwords_container = self.passwords
-            .iter_mut()
-            .fold(Scrollable::new(&mut self.passwords_state), |container, password| {
-                container.push(password.view())
-            })
+        let passwords_container = Scrollable::new(&mut self.passwords_state)
             .spacing(5)
             .padding(5);
+
+        let passwords_container = self.passwords
+            .iter_mut()
+            .fold(passwords_container, |container, password| {
+                container.push(password.view())
+            });
 
         let content_container = Row::new()
             .height(Length::Fill)

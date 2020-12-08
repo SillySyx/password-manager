@@ -17,6 +17,8 @@ pub struct EditPassword {
     save_button_state: button::State,
     remove_button_state: button::State,
     back_button_state: button::State,
+    copy_password_state: button::State,
+    copy_description_state: button::State,
 
     name_state: text_input::State,
     description_state: text_input::State,
@@ -36,6 +38,8 @@ impl EditPassword {
             save_button_state: button::State::new(),
             remove_button_state: button::State::new(),
             back_button_state: button::State::new(),
+            copy_password_state: button::State::new(),
+            copy_description_state: button::State::new(),
 
             name_state: text_input::State::new(),
             description_state: text_input::State::new(),
@@ -66,7 +70,8 @@ impl EditPassword {
         let header = Text::new(&translate(Languages::English, "edit.header"))
             .size(30);
 
-        let name_title = Text::new(&translate(Languages::English, "edit.name"));
+        let name_title = Text::new(&translate(Languages::English, "edit.name"))
+            .size(18);
 
         let name_input = TextInput::new(
             &mut self.name_state,
@@ -76,7 +81,8 @@ impl EditPassword {
         )
         .padding(10);
 
-        let description_title = Text::new(&translate(Languages::English, "edit.description"));
+        let description_title = Text::new(&translate(Languages::English, "edit.description"))
+            .size(18);
 
         let description_input = TextInput::new(
             &mut self.description_state,
@@ -84,9 +90,24 @@ impl EditPassword {
             &self.description,
             |value| Messages::EditViewInputKeyChanged { input: "description", value },
         )
+        .width(Length::Fill)
         .padding(10);
 
-        let category_title = Text::new(&translate(Languages::English, "edit.category"));
+        let copy_description = create_button(
+            &mut self.copy_description_state,
+            None,
+            Some("copy.svg"),
+            Messages::CopyDescription { name: self.name.clone() },
+        )
+        .padding(12);
+
+        let description_row = Row::new()
+            .spacing(5)
+            .push(description_input)
+            .push(copy_description);
+
+        let category_title = Text::new(&translate(Languages::English, "edit.category"))
+            .size(18);
 
         let category_input = TextInput::new(
             &mut self.category_state,
@@ -96,7 +117,8 @@ impl EditPassword {
         )
         .padding(10);
 
-        let password_title = Text::new(&translate(Languages::English, "edit.password"));
+        let password_title = Text::new(&translate(Languages::English, "edit.password"))
+            .size(18);
 
         let password_input = TextInput::new(
             &mut self.password_state,
@@ -105,7 +127,21 @@ impl EditPassword {
             |value| Messages::EditViewInputKeyChanged { input: "password", value }
         )
         .padding(10)
+        .width(Length::Fill)
         .password();
+
+        let copy_password = create_button(
+            &mut self.copy_password_state,
+            None,
+            Some("copy.svg"),
+            Messages::CopyPassword { name: self.name.clone() },
+        )
+        .padding(12);
+
+        let password_row = Row::new()
+            .spacing(5)
+            .push(password_input)
+            .push(copy_password);
 
         let save_button = create_button(
             &mut self.save_button_state,
@@ -145,12 +181,12 @@ impl EditPassword {
             .push(header)
             .push(name_title)
             .push(name_input)
-            .push(description_title)
-            .push(description_input)
             .push(category_title)
             .push(category_input)
+            .push(description_title)
+            .push(description_row)
             .push(password_title)
-            .push(password_input)
+            .push(password_row)
             .push(button_row)
             .push(remove_button);
 
