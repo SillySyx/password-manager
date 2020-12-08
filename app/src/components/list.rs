@@ -42,10 +42,15 @@ impl List {
             Messages::ChangeView { view: Views::AddPassword }
         );
 
+        let active_category = match self.selected_category.clone() {
+            Some(value) => value,
+            None => String::from(""),
+        };
+
         let categories_container = self.categories
             .iter_mut()
             .fold(Scrollable::new(&mut self.categories_state), |container, category| {
-                container.push(category.view())
+                container.push(category.view(active_category == category.name.clone()))
             })
             .spacing(5)
             .padding(5);

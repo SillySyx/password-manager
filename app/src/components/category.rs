@@ -2,6 +2,7 @@ use iced::{button, Element, Button, Container, Text };
 
 use crate::{
     messages::Messages,
+    styles::{CategoryStyle, ActiveCategoryStyle},
 };
 
 pub struct Category {
@@ -17,11 +18,17 @@ impl Category {
         }
     }
 
-    pub fn view(&mut self) -> Element<Messages> {
-        let text = Text::new(&self.name);
+    pub fn view(&mut self, active: bool) -> Element<Messages> {
+        let text = Text::new(&self.name)
+            .size(18);
 
-        let button = Button::new(&mut self.select_state, text)
-            .on_press(Messages::ToggleCategory { name: self.name.clone() });
+        let mut button = Button::new(&mut self.select_state, text)
+            .on_press(Messages::ToggleCategory { name: self.name.clone() })
+            .style(CategoryStyle);
+
+        if active {
+            button = button.style(ActiveCategoryStyle);
+        }
 
         let container = Container::new(button);
 

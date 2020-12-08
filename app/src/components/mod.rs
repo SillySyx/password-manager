@@ -79,7 +79,7 @@ pub fn create_link_button<'a, T: Clone + 'static>(
 
     let container = match text {
         Some(text) => {
-            let text = Text::new(text);
+            let text = Text::new(text).size(18);
             container.push(text)
         },
         None => container,

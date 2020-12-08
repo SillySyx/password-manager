@@ -10,6 +10,6 @@ pub use {
     header::HeaderStyle,
     widget::WidgetStyle,
     linkbutton::LinkButtonStyle,
-    category::CategoryStyle,
+    category::{CategoryStyle, ActiveCategoryStyle},
     password::PasswordStyle,
 };
