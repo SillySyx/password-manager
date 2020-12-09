@@ -1,55 +1,70 @@
-use iced::{button, Element, Length, Row, Text};
+use iced::{button, Element, Length, Row, Container, Align};
 
 use crate::{
-    components::{create_button, create_widget},
+    components::create_link_button,
     messages::Messages,
-    translations::{translate, Languages},
+    styles::PasswordStyle,
 };
 
+#[derive(Clone)]
 pub struct Password {
-    pub key: [u8; 32],
     pub name: String,
+    pub description: String,
+    pub category: String,
 
+    text_state: button::State,
     edit_state: button::State,
     copy_state: button::State,
 }
 
 impl Password {
-    pub fn new(name: String, key: [u8; 32]) -> Self {
+    pub fn new(name: String, description: String, category: String) -> Self {
         Self {
-            key,
             name,
+            description,
+            category,
+            text_state: button::State::new(),
             edit_state: button::State::new(),
             copy_state: button::State::new(),
         }
     }
 
     pub fn view(&mut self) -> Element<Messages> {
-        let text = Text::new(&self.name).width(Length::Fill);
-
-        let edit_button = create_button(
-            &mut self.edit_state,
-            &translate(Languages::English, "password.edit-button"),
+        let text_button = create_link_button(
+            &mut self.text_state,
+            Some(&self.name),
+            None,
             Messages::EditPassword { name: self.name.clone() }
         )
-        .padding(5);
+        .style(PasswordStyle);
 
-        let copy_button = create_button(
+        let text_container = Container::new(text_button)
+            .width(Length::Fill);
+
+        let edit_button = create_link_button(
+            &mut self.edit_state,
+            None,
+            Some("cog.svg"),
+            Messages::EditPassword { name: self.name.clone() }
+        );
+
+        let copy_button = create_link_button(
             &mut self.copy_state,
-            &translate(Languages::English, "password.copy-button"),
+            None,
+            Some("key.svg"),
             Messages::CopyPassword { name: self.name.clone() }
-        )
-        .padding(5);
+        );
 
         let row = Row::new()
-            .push(text)
-            .push(edit_button)
+            .push(text_container)
             .push(copy_button)
+            .push(edit_button)
             .spacing(5)
-            .align_items(iced::Align::Center);
+            .align_items(Align::Center);
 
-        create_widget(row)
-            .padding(10)
+        Container::new(row)
+            .padding(5)
+            .style(PasswordStyle)
             .into()
     }
 }
