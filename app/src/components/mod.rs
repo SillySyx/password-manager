@@ -34,9 +34,10 @@ pub fn create_button<'a, T: Clone + 'static>(
 
     let container = match icon {
         Some(icon) => {
-            let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
+            let svg = create_svg(icon)
                 .width(Length::from(16))
                 .height(Length::from(16));
+
             container.push(svg)
         },
         None => container,
@@ -56,6 +57,26 @@ pub fn create_button<'a, T: Clone + 'static>(
         .style(MainStyle)
 }
 
+fn load_icon_bytes(name: &str) -> Option<Vec<u8>> {
+    match name {
+        "add.svg" => Some(include_bytes!("../../resources/icons/add.svg").to_vec()),
+        "back.svg" => Some(include_bytes!("../../resources/icons/back.svg").to_vec()),
+        "cog.svg" => Some(include_bytes!("../../resources/icons/cog.svg").to_vec()),
+        "copy.svg" => Some(include_bytes!("../../resources/icons/copy.svg").to_vec()),
+        "generate.svg" => Some(include_bytes!("../../resources/icons/generate.svg").to_vec()),
+        "key.svg" => Some(include_bytes!("../../resources/icons/key.svg").to_vec()),
+        "logo.svg" => Some(include_bytes!("../../resources/icons/logo.svg").to_vec()),
+        "trash.svg" => Some(include_bytes!("../../resources/icons/trash.svg").to_vec()),
+        "unlock.svg" => Some(include_bytes!("../../resources/icons/unlock.svg").to_vec()),
+        _ => None,
+    }
+}
+
+fn create_svg(icon: &str) -> Svg {
+    let icon_bytes = load_icon_bytes(icon).expect("failed to load aaaah");
+
+    Svg::new(iced::svg::Handle::from_memory(icon_bytes))
+}
 
 pub fn create_link_button<'a, T: Clone + 'static>(
     state: &'a mut iced::button::State,
@@ -69,7 +90,7 @@ pub fn create_link_button<'a, T: Clone + 'static>(
 
     let container = match icon {
         Some(icon) => {
-            let svg = Svg::from_path(format!("{}/resources/icons/{}", env!("CARGO_MANIFEST_DIR"), icon))
+            let svg = create_svg(icon)
                 .width(Length::from(16))
                 .height(Length::from(16));
             container.push(svg)
@@ -133,7 +154,7 @@ pub fn create_layout<'a, T: Clone + 'static>(
             .align_x(Align::End)
     };
 
-    let logo = Svg::from_path(format!("{}/resources/icons/logo.svg", env!("CARGO_MANIFEST_DIR")))
+    let logo = create_svg("logo.svg")
         .width(Length::from(30))
         .height(Length::from(30));
 
