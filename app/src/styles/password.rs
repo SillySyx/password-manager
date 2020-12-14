@@ -41,3 +41,15 @@ impl button::StyleSheet for PasswordStyle {
         }
     }
 }
+
+pub struct AlternatedPasswordStyle;
+
+impl container::StyleSheet for AlternatedPasswordStyle {
+    fn style(&self) -> container::Style {
+        container::Style {
+            background: None,
+            text_color: Some(TEXTCOLOR),
+            ..container::Style::default()
+        }
+    }
+}

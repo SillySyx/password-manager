@@ -11,5 +11,5 @@ pub use {
     widget::WidgetStyle,
     linkbutton::LinkButtonStyle,
     category::{CategoryStyle, ActiveCategoryStyle},
-    password::PasswordStyle,
+    password::{PasswordStyle, AlternatedPasswordStyle},
 };

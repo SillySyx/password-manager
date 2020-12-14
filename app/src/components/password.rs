@@ -3,7 +3,7 @@ use iced::{button, Element, Length, Row, Container, Align};
 use crate::{
     components::create_link_button,
     messages::Messages,
-    styles::PasswordStyle,
+    styles::{PasswordStyle, AlternatedPasswordStyle},
 };
 
 #[derive(Clone)]
@@ -29,7 +29,7 @@ impl Password {
         }
     }
 
-    pub fn view(&mut self) -> Element<Messages> {
+    pub fn view(&mut self, alternated_row: bool) -> Element<Messages> {
         let text_button = create_link_button(
             &mut self.text_state,
             Some(&self.name),
@@ -38,8 +38,18 @@ impl Password {
         )
         .style(PasswordStyle);
 
-        let text_container = Container::new(text_button)
-            .width(Length::Fill);
+        let desciption = iced::Text::new(self.description.clone())
+            .color(iced::Color::from_rgb(0.3, 0.3, 0.3))
+            .size(16);
+
+        let description_row = Row::new()
+            .push(iced::Space::with_width(Length::from(5)))
+            .push(desciption);
+
+        let text_container = iced::Column::new()
+            .width(Length::Fill)
+            .push(text_button)
+            .push(description_row);
 
         let edit_button = create_link_button(
             &mut self.edit_state,
@@ -62,9 +72,13 @@ impl Password {
             .spacing(5)
             .align_items(Align::Center);
 
-        Container::new(row)
-            .padding(5)
-            .style(PasswordStyle)
-            .into()
+        let container = Container::new(row)
+            .padding(15);
+
+        if alternated_row {
+            return container.style(AlternatedPasswordStyle).into();
+        }
+
+        container.style(PasswordStyle).into()
     }
 }

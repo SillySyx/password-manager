@@ -10,7 +10,7 @@ pub enum Messages {
     CopyPassword { name: String },
     CopyDescription { name: String },
     RemovePassword { name: String },
-    ToggleCategory { name: String },
+    SelectCategory { name: Option<String> },
     GeneratePassphraseForAddView,
     AddViewInputKeyChanged { input: &'static str, value: String },
     EditViewInputKeyChanged { input: &'static str, value: String },

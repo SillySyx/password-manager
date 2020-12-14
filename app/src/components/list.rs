@@ -42,27 +42,24 @@ impl List {
             Messages::ChangeView { view: Views::AddPassword }
         );
 
-        let active_category = match self.selected_category.clone() {
-            Some(value) => value,
-            None => String::from(""),
-        };
+        let selected_category = self.selected_category.clone();
 
         let categories_container = self.categories
             .iter_mut()
             .fold(Scrollable::new(&mut self.categories_state), |container, category| {
-                container.push(category.view(active_category == category.name.clone()))
+                container.push(category.view(selected_category == category.value.clone()))
             })
-            .spacing(5)
-            .padding(5);
+            .padding(15);
 
-        let passwords_container = Scrollable::new(&mut self.passwords_state)
-            .spacing(5)
-            .padding(5);
+
+        let passwords_container = Scrollable::new(&mut self.passwords_state);
 
         let passwords_container = self.passwords
             .iter_mut()
-            .fold(passwords_container, |container, password| {
-                container.push(password.view())
+            .enumerate()
+            .fold(passwords_container, |container, (index, password)| {
+                let alternated_row = index % 2 == 0;
+                container.push(password.view(alternated_row))
             });
 
         let content_container = Row::new()
@@ -78,21 +75,25 @@ impl List {
         
         self.categories = read_categories_from_passwords(&passwords);
 
+        // if self.selected_category == None {
+        //     if let Some(category) = self.categories.first() {
+        //         self.selected_category = category.value.clone();
+        //     }
+        // }
+
         self.passwords = filter_passwords_based_on_selected_category(passwords, self.selected_category.clone());
 
         Ok(())
     }
 
-    pub fn toggle_category(&mut self, name: String) {
-        if let Some(selected_category) = self.selected_category.clone() {
-            if selected_category == name {
-                self.selected_category = None;
-                self.update_password_list().expect("failed to update list");
-                return;
-            }
+    pub fn select_category(&mut self, name: Option<String>) {
+        if name == self.selected_category {
+            self.selected_category = None;
+            self.update_password_list().expect("failed to update list");
+            return;
         }
 
-        self.selected_category = Some(name);
+        self.selected_category = name;
         self.update_password_list().expect("failed to update list");
     }
 }
@@ -117,7 +118,7 @@ fn read_categories_from_passwords(passwords: &[Password]) -> Vec<Category> {
     let mut categories: Vec<Category> = passwords
         .iter()
         .filter(|password| !password.category.is_empty())
-        .map(|password| Category::new(password.category.clone()))
+        .map(|password| Category::new(password.category.clone(), Some(password.category.clone())))
         .collect();
 
     categories.sort_by_key(|category| category.name.to_lowercase());
