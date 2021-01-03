@@ -54,15 +54,19 @@ impl Sandbox for App {
             Messages::CopyDescription { name } => self.copy_description(name),
             Messages::RemovePassword { name } => self.remove_password(name),
             Messages::AddViewInputKeyChanged { input, value } => {
-                self.add_view.update_input(input, value)
+                self.add_view.update_input(input, value);
             }
             Messages::EditViewInputKeyChanged { input, value } => {
-                self.edit_view.update_input(input, value)
+                self.edit_view.update_input(input, value);
             }
             Messages::UnlockViewInputKeyChanged { value } => self.unlock_view.input_key = value,
             Messages::UpdatePassword { entry, name, description, category, password} => self.update_password(entry, name, description, category, password),
             Messages::GeneratePassphraseForAddView => self.add_view.generate_passphrase(),
             Messages::SelectCategory { name } => self.list_view.select_category(name),
+            Messages::ListViewInputKeyChanged { input, value } => {
+                self.list_view.update_input(input, value);
+                self.list_view.update_password_list().unwrap();
+            }
         }
     }
 

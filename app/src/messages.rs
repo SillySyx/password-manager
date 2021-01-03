@@ -14,5 +14,6 @@ pub enum Messages {
     GeneratePassphraseForAddView,
     AddViewInputKeyChanged { input: &'static str, value: String },
     EditViewInputKeyChanged { input: &'static str, value: String },
+    ListViewInputKeyChanged { input: &'static str, value: String },
     UnlockViewInputKeyChanged { value: String },
 }

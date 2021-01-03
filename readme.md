@@ -25,3 +25,7 @@ if you have issues with x11 you may want to `sudo apt install librust-x11-dev`
 if you have issues with servo-fontconfig-sys you may want to `sudo apt install libxft-dev`
 
 if you have issues `/usr/bin/ld: cannot find -lxcb-xfixes` you may want to `sudo apt install libxcb-xfixes0-dev`
+
+
+## Wayland issues
+If you get an error with wayland-client when building you need to run `cargo update`

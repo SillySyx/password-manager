@@ -1,5 +1,5 @@
 use std::error::Error;
-use iced::{Element, Length, Row, Scrollable, button, scrollable};
+use iced::{Column, Container, Element, Length, Row, Scrollable, button, scrollable, TextInput, text_input};
 
 use crate::{
     components::{create_link_button, create_layout, Password, Category},
@@ -15,7 +15,9 @@ pub struct List {
     passwords: Vec<Password>,
     categories: Vec<Category>,
     selected_category: Option<String>,
+    search_text: String,
 
+    search_text_state: text_input::State,
     categories_state: scrollable::State,
     passwords_state: scrollable::State,
     add_button_state: button::State,
@@ -28,6 +30,8 @@ impl List {
             passwords: vec![],
             categories: vec![],
             selected_category: None,
+            search_text: String::from(""),
+            search_text_state: text_input::State::new(),
             categories_state: scrollable::State::new(),
             passwords_state: scrollable::State::new(),
             add_button_state: button::State::new(),
@@ -51,7 +55,6 @@ impl List {
             })
             .padding(15);
 
-
         let passwords_container = Scrollable::new(&mut self.passwords_state);
 
         let passwords_container = self.passwords
@@ -62,24 +65,33 @@ impl List {
                 container.push(password.view(alternated_row))
             });
 
+        let search_box = TextInput::new(
+            &mut self.search_text_state, 
+            &translate(Languages::English, "list.search"), 
+            &self.search_text, 
+            |value| Messages::ListViewInputKeyChanged { input: "search", value }
+        )
+        .padding(10);
+
+        let content = Column::new()
+            .push(search_box)
+            .push(passwords_container);
+
+        let content = Container::new(content)
+            .padding(5);
+
         let content_container = Row::new()
             .height(Length::Fill)
             .push(categories_container)
-            .push(passwords_container);
+            .push(content);
 
         create_layout(None, Some(add_button.into()), content_container.into()).into()
     }
 
     pub fn update_password_list(&mut self) -> Result<(), Box<dyn Error>> {
-        let passwords = list_passwords(self.key)?;
+        let passwords = list_passwords(self.key, self.search_text.clone())?;
         
         self.categories = read_categories_from_passwords(&passwords);
-
-        // if self.selected_category == None {
-        //     if let Some(category) = self.categories.first() {
-        //         self.selected_category = category.value.clone();
-        //     }
-        // }
 
         self.passwords = filter_passwords_based_on_selected_category(passwords, self.selected_category.clone());
 
@@ -96,9 +108,16 @@ impl List {
         self.selected_category = name;
         self.update_password_list().expect("failed to update list");
     }
+
+    pub fn update_input(&mut self, name: &str, value: String) {
+        match name {
+            "search" => self.search_text = value,
+            _ => {}
+        };
+    }
 }
 
-fn list_passwords(key: [u8; 32]) -> Result<Vec<Password>, Box<dyn Error>> {
+fn list_passwords(key: [u8; 32], search_text: String) -> Result<Vec<Password>, Box<dyn Error>> {
     let eventlog = load_eventlog(&key)?;
 
     let initial_state = PasswordsState::new();
@@ -107,6 +126,13 @@ fn list_passwords(key: [u8; 32]) -> Result<Vec<Password>, Box<dyn Error>> {
     let mut passwords: Vec<Password> = state.passwords
         .iter()
         .map(|password| Password::new(password.name.clone(), password.description.clone(), password.category.clone()))
+        .filter(|password| {
+            if search_text.is_empty() {
+                return true;
+            }
+
+            password.name.to_lowercase().contains(search_text.to_lowercase().as_str())
+        })
         .collect();
 
     passwords.sort_by_key(|password| password.name.to_lowercase());
