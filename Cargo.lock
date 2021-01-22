@@ -328,6 +328,18 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a2df960f5d869b2dd8532793fde43eb5427cceb126c929747a26823ab0eeb536"
 
 [[package]]
+name = "core"
+version = "1.5.0"
+dependencies = [
+ "clipboard",
+ "crypto",
+ "event-sourcing",
+ "rand",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "core-foundation"
 version = "0.6.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1829,13 +1841,15 @@ dependencies = [
 name = "passwordmanager"
 version = "1.5.0"
 dependencies = [
- "clipboard",
- "crypto",
- "event-sourcing",
+ "core",
  "iced",
- "rand",
- "serde",
- "serde_json",
+]
+
+[[package]]
+name = "passwordmanager-cli"
+version = "1.5.0"
+dependencies = [
+ "core",
 ]
 
 [[package]]

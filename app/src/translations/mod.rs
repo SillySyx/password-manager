@@ -1,4 +1,4 @@
-use serde_json::Value;
+use core::serde_json::Value;
 
 pub enum Languages {
     English,
@@ -6,7 +6,7 @@ pub enum Languages {
 
 pub fn translate(language: Languages, key: &str) -> String {
     let translations: Value = match language {
-        Languages::English => serde_json::from_str(include_str!("translations.en.json")).expect("failed to load translations"),
+        Languages::English => core::serde_json::from_str(include_str!("translations.en.json")).expect("failed to load translations"),
     };
 
     match translations[key].as_str() {

@@ -12,9 +12,25 @@ Passwords will be stored in the same folder as the executable.
 
 
 ## Build
+First you need to create the build container (only needed once)
 ```
 docker build -t passwordmanager:builder .
-docker run -it --rm -v $(pwd):/src passwordmanager:builder
 ```
 
-> In windows to get the current directory you need to use `%cd%` in command prompt or `${PWD}` in powershell.
+To build everything:
+```
+docker run -it --rm -v $(pwd):/src passwordmanager:builder cargo build --release
+```
+
+To build cli:
+```
+docker run -it --rm -v $(pwd):/src passwordmanager:builder cargo build --release --bin passwordmanager-cli
+```
+
+To build gui app:
+```
+docker run -it --rm -v $(pwd):/src passwordmanager:builder cargo build --release --bin passwordmanager
+```
+
+
+> In windows to get the current directory you need to use `%cd%` in command prompt or `${pwd}` in powershell.

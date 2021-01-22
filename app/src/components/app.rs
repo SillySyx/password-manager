@@ -1,17 +1,20 @@
 use iced::{Element, Sandbox};
 
-use crate::{
+use core::{
     clipboard::copy_value_to_clipboard,
-    components::{AddPassword, EditPassword, Error, List, Unlock},
     datastore::{append_event_to_eventlog, load_eventlog},
     events::{AddPasswordEvent, ChangeNameEvent, ChangeDescriptionEvent, ChangeCategoryEvent, ChangePasswordEvent, RemovePasswordEvent},
-    messages::Messages,
     states::{Password, PasswordsState},
+};
+
+use crate::{
+    components::{AddPassword, EditPassword, Error, List, Unlock},
+    messages::Messages,
     translations::{translate, Languages},
     views::Views,
 };
 
-use crypto::generate_key_from_seed;
+use core::crypto::generate_key_from_seed;
 
 pub struct App {
     key: [u8; 32],

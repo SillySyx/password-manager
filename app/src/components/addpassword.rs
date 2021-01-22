@@ -1,11 +1,12 @@
 use iced::{button, text_input, Column, Element, Length, Row, Text, TextInput, Space};
 
+use core::passphrase::generate_passphrase;
+
 use crate::{
     components::{create_button, create_widget, create_layout},
     messages::Messages,
     translations::{translate, Languages},
     views::Views,
-    passphrase::generate_passphrase,
 };
 
 pub struct AddPassword {

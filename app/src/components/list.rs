@@ -1,13 +1,16 @@
 use std::error::Error;
 use iced::{Column, Container, Element, Length, Row, Scrollable, button, scrollable, TextInput, text_input};
 
+use core::{
+    datastore::load_eventlog,
+    states::PasswordsState,
+};
+
 use crate::{
     components::{create_link_button, create_layout, Password, Category},
-    datastore::load_eventlog,
     messages::Messages,
     translations::{translate, Languages},
     views::Views,
-    states::PasswordsState,
 };
 
 pub struct List {

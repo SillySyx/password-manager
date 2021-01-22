@@ -1,5 +1,8 @@
 [workspace]
 members = [
+    "event-sourcing",
     "crypto",
-    "app"
+    "core",
+    "app",
+    "cli",
 ]

@@ -4,5 +4,3 @@ FROM rust:latest as base
 
 FROM base as build
     WORKDIR /src
-
-    ENTRYPOINT ["cargo", "build", "--release"]
